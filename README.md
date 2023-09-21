@@ -6,13 +6,13 @@ The model is used to define the inertial behavior of the heat sink.
 
 ## Installation 
 
-LoadBasedTesting can be installed as package. 
+LoadBasedTesting can be installed as a package. 
 In order to use this package, you can either install it via pip install (see
-below) or simply download the python files and use them in your own script. 
+below) or simply download the Python files and use them in your own script. 
 Installation steps are:
 1.  Download or clone the repository via git: 
 `git clone https://github.com/BAMresearch/bam-load-based-testing/`
-2. Install package via pip. Use conda prompt console or the terminal within pycharm:
+2. Install the package via pip. Use conda prompt console or the terminal within pycharm:
 `pip install -e <local path to git repo>`
 
 ## Two-mass model
@@ -41,7 +41,7 @@ The return temperature $`\vartheta_\mathrm{R}`$ of the heat pump corresponds to 
 
 ![img.png](model.png "two-mass building model")
 
-## Impelmentation in python
+## Implementation in python
 
 
 The building model is defined in the class "TwoMassBuilding" in "twoMassModel.py" and consists of two objects of the class "ThermalMass".
@@ -52,7 +52,7 @@ The function "createBuilding" determines all necessary parameters of the buildin
 
 Parameterized building models for the BAM Round Robin Test can be found in the folder "BuildingModels".
 
-Models can be tested by using the scripts in Example folder.
+Models can be tested by using the scripts in the Example folder.
 
 
 
