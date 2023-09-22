@@ -8,7 +8,7 @@ mass_flow = 720/3600
 t_b = 20 # constant building temperature
 
 ParaMTBui_E = CalcParameters(t_a=-10, q_design=q_design_e, tau_b=tau_b, tau_h=tau_h, t_flow_design=55, t_b=t_b,
-                             const_flow=True, mass_flow=mass_flow, boostHeat=True)
+                             const_flow=True, mass_flow=mass_flow, boostHeat=True, maxPowBooHea=7000)
 MTBui_E = ParaMTBui_E.createBuilding()
 
 ParaMTBui_A = CalcParameters(t_a=-7, q_design=q_design_e*0.885, tau_b=tau_b, tau_h=tau_h, t_flow_design=52, t_b=t_b,

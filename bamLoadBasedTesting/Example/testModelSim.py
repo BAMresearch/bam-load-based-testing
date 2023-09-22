@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_MT.MTBui_A
+Building = BAM_RRT_MT.MTBui_E
 stepSize = 0.5
 T_b = []
 T_H = []
@@ -13,6 +13,7 @@ T_ret = []
 q_flow_hp = []
 q_flow_hb = []
 q_flow_ba = []
+q_flow_bh = []
 q_flow_int = []
 t = []
 t_sup = []
@@ -21,13 +22,13 @@ internalGains = 0 # 0 W constant internal gains into building
 for x in range(3600*3):
     t.append(x * stepSize)
     "Step response"
-    if x<36000:
+    if x<3600:
         t_sup.append(52)
     else:
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
     "Do step with Building Model"
-    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=1440/3600, stepSize=stepSize, q_dot_int=internalGains)
+    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=720/3600, stepSize=stepSize, q_dot_int=internalGains)
     "Save current values:"
     T_b.append(Building.MassB.T)
     T_H.append(Building.MassH.T)
@@ -35,6 +36,7 @@ for x in range(3600*3):
     q_flow_hb.append(Building.q_dot_hb)
     q_flow_hp.append(Building.q_dot_hp)
     q_flow_int.append(Building.q_dot_int)
+    q_flow_bh.append(Building.q_dot_bh)
 
 hours = np.array(t)
 hours = hours/3600
@@ -49,10 +51,11 @@ plt.xlabel('time in hours')
 plt.show()
 
 fig, ax = plt.subplots()
-ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> ')
+ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
 ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
 ax.plot(hours, q_flow_ba, label = 'heat flow Building --> Ambient')
-ax.plot(hours, q_flow_ba, label = 'heat flow internal gains --> building')
+ax.plot(hours, q_flow_int, label = 'heat flow internal gains --> building')
+ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
 ax.legend()
 plt.ylabel('[W]')
 plt.xlabel('time in hours')
