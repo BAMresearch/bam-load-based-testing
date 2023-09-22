@@ -29,7 +29,8 @@ class ThermalMass:
 
 
 class TwoMassBuilding:
-    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, t_start_b=20, boostHeat = False):
+    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, t_start_b=20,
+                 boostHeat = False, maxPowBooHea = 0):
         """
         Init function, use either °C or K but not use both
         :param ua_hb: thermal conductivity [W/K] between transfer system (H) and Building (B)
@@ -53,6 +54,7 @@ class TwoMassBuilding:
         self.q_dot_bh = 0
         self.t_ret = t_start_h
         self.t_flow_design = t_flow_design
+        self.maxPowBooHea = maxPowBooHea
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
         """
@@ -64,7 +66,8 @@ class TwoMassBuilding:
         """
         if self.boostHeat and t_sup < self.t_flow_design:
             self.q_dot_bh = m_dot*4183*(self.t_flow_design-t_sup)
-            t_sup = self.t_flow_design
+            if self.q_dot_bh > self.maxPowBooHea:
+                self.q_dot_bh = self.maxPowBooHea
         else:
             self.q_dot_bh = 0
 
@@ -99,8 +102,8 @@ class TwoMassBuilding:
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_dot, t_sup=t_sup, t_ret_mea=t_ret_mea)
-        # heat flow heat pump - heat flow H-->B
-        self.MassH.qflow((self.q_dot_hp - self.q_dot_hb)*stepSize)
+        # heat flow heat pump & booster heater - heat flow H-->B
+        self.MassH.qflow((self.q_dot_hp + self.q_dot_bh - self.q_dot_hb)*stepSize)
         # heat flow H-->B - heat flow B-->A + heat flow internal gain
         self.MassB.qflow((self.q_dot_hb - self.q_dot_ba + self.q_dot_int)*stepSize)
         #  calculate new return temperature
@@ -108,7 +111,7 @@ class TwoMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a, q_design, t_flow_design, mass_flow, delta_T_cond=5, const_flow=True,  tau_b=55E6/263,
-                 tau_h=505E3/258, t_b=20, boostHeat = False):
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
@@ -140,11 +143,12 @@ class CalcParameters:
         self.mcp_b = self.tau_b * self.ua_ba
         self.mcp_h = self.tau_h * self.ua_hb
         self.boostHeat = boostHeat
+        self.maxPowBooHea = maxPowBooHea
 
     def createBuilding(self):
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_design,
-                                   boostHeat=self.boostHeat)
+                                   boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea)
         print("Building created: Mass B = " + str(building.MassB.mcp) + " ua_ba = " + str(building.ua_ba) + "Mass H = "
               + str(building.MassH.mcp) + " ua_hb = " + str(building.ua_hb))
         return building
