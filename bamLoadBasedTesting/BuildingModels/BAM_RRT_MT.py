@@ -1,4 +1,4 @@
-from bamLoadBasedTesting.twoMassModel import CalcParameters
+from twoMassModel import CalcParameters
 
 "Change design power according to your heat pump"
 q_design_e = 5390 # design heating power in E - only value which is dependent on the heat pump
