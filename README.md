@@ -51,7 +51,7 @@ Additionally, the time constants tau_H and tau_B of the masses as well as the am
 The function "createBuilding" determines all necessary parameters of the building model.
 
 Parameterized building models for the BAM Round Robin Test can be found in the folder "BuildingModels".
-All input parameters are in SI units. 
+All input parameters are in SI units. \
 `q_design_e in Watt: - parameter has to be set, design heating power in PLC E` 
 
 `tau_b in seconds - constant, time constant of building envelope`
