@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_MT.MTBui_E
+Building = BAM_RRT_MT.MTBui_C
 stepSize = 1
 T_b = []
 T_H = []
@@ -18,14 +18,24 @@ q_flow_int = []
 t = []
 t_sup = []
 internalGains = 0 # 0 W constant internal gains into building
+on = 0 # on time
+off = 0 # off time
+q_design = 5390 *0.346*2
 #loop by doing x steps
-for x in range(3600*12):
+for x in range(3600*4):
     t.append(x * stepSize)
     "Step response"
-    if x<3600*12:
-        t_sup.append(52)
+    if on<20*60:
+        t_sup.append(Building.t_ret + q_design/(720/3600*4180))
+        on+=1
+    elif off < 20*60:
+        t_sup.append(Building.t_ret)
+        off+=1
     else:
         t_sup.append(Building.t_ret)
+        off = 0
+        on = 0
+
     T_ret.append(Building.t_ret)
     "Do step with Building Model"
     Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=720/3600, stepSize=stepSize, q_dot_int=internalGains)
