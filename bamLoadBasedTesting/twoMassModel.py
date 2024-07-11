@@ -72,7 +72,10 @@ class TwoMassBuilding:
             self.q_dot_bh = 0
         deltaT_bh = (self.q_dot_bh/(m_dot*4183))
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
-        self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
+        if self.t_ret >20:
+            self.q_dot_hb = 5390 *0.346 #self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
+        else:
+            self.q_dot_hb = 0
         self.q_dot_ba = self.ua_ba * (self.MassB.T - self.t_a)
 
 

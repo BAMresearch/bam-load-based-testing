@@ -28,7 +28,7 @@ for x in range(3600*4):
     if on<20*60:
         t_sup.append(Building.t_ret + q_design/(720/3600*4180))
         on+=1
-    elif off < 20*60:
+    elif off < 60*60:
         t_sup.append(Building.t_ret)
         off+=1
     else:
