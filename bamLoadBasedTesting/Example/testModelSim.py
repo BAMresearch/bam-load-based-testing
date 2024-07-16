@@ -1,12 +1,12 @@
 """Script to test 2-mass-building model"""
 
-from bamLoadBasedTesting.BuildingModels import BAM_RRT_MT
+from BuildingModels import BAM_RRT_MT
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
 Building = BAM_RRT_MT.MTBui_E
-stepSize = 0.5
+stepSize = 1
 T_b = []
 T_H = []
 T_ret = []
@@ -19,10 +19,10 @@ t = []
 t_sup = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-for x in range(3600*3):
+for x in range(3600*12):
     t.append(x * stepSize)
     "Step response"
-    if x<3600:
+    if x<3600*12:
         t_sup.append(52)
     else:
         t_sup.append(Building.t_ret)
@@ -46,7 +46,7 @@ ax.plot(hours, T_H, label = 'transfer system temperature')
 ax.plot(hours, t_sup, label = 'supply temperature')
 ax.legend()
 plt.grid(True)
-plt.ylabel('[°C]')
+plt.ylabel('Temperature in °C')
 plt.xlabel('time in hours')
 plt.show()
 
@@ -54,10 +54,9 @@ fig, ax = plt.subplots()
 ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
 ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
 ax.plot(hours, q_flow_ba, label = 'heat flow Building --> Ambient')
-ax.plot(hours, q_flow_int, label = 'heat flow internal gains --> building')
 ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
 ax.legend()
-plt.ylabel('[W]')
+plt.ylabel('Heat flow in W')
 plt.xlabel('time in hours')
 plt.grid(True)
 plt.show()
@@ -65,7 +64,7 @@ plt.show()
 fig, ax = plt.subplots()
 ax.plot(hours, T_b, label = 'building temperature')
 ax.legend()
-plt.ylabel('[°C]')
+plt.ylabel('Temperature in °C')
 plt.xlabel('time in hours')
 plt.grid(True)
 plt.show()
