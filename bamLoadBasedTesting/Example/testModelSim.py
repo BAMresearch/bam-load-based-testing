@@ -1,11 +1,11 @@
 """Script to test 2-mass-building model"""
 
-from BuildingModels import BAM_RRT_MT
+from BuildingModels import BAM_RRT_3HP
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_MT.MTBui_E
+Building = BAM_RRT_3HP.MTBui_C
 stepSize = 1
 T_b = []
 T_H = []
@@ -22,7 +22,7 @@ internalGains = 0 # 0 W constant internal gains into building
 for x in range(3600*12):
     t.append(x * stepSize)
     "Step response"
-    if x<3600*12:
+    if x<3600*6:
         t_sup.append(52)
     else:
         t_sup.append(Building.t_ret)
