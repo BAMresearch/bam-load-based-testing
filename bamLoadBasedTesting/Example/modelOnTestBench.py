@@ -1,11 +1,11 @@
-from bamLoadBasedTesting.BuildingModels import BAM_RRT_MT
+from BuildingModels import BAM_RRT_3HP
 import time
 
 # Step Size
 stepSize = 1
 
 # Create Reduced building
-BamBuilding = BAM_RRT_MT.MTBui_A
+BamBuilding = BAM_RRT_3HP.MTBui_A
 
 while True:
     t1 = time.time()
