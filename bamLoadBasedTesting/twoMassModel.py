@@ -110,25 +110,31 @@ class TwoMassBuilding:
         self.t_ret = self.calc_return(t_sup)
 
 class CalcParameters:
-    def __init__(self, t_a, q_design, t_flow_design, mass_flow, delta_T_cond=5, const_flow=True,  tau_b=55E6/263,
+    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, mass_flow, delta_T_cond=5, const_flow=True,  tau_b=55E6/263,
                  tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
-        @param t_a: nominal outdoor temperature [°C]
+        @param t_a_design: design nominal outdoor temperature [°C]
+        @param t_a: outdoor temperature in test point
         @param q_design: nominal heating power  [W]
-        @param t_flow_design: nominal flow temperature [°C]
+        @param PLC: rel heating load in test point (0...1)
+        @param t_flow_design: nominal design flow temperature [°C]
+        @param t_flow_plc: flow temperature in test point (°C)
         @param t_b: nominal building temperature (standard value: 20 °C) [°C]
         @param mass_flow: mass flow if const_flow = True
         @param delta_T_cond: temperature difference t_flow-t_ret, if no constant mass flow
         @param const_flow: True/False calculate parameters with given mass flow (True) or given temperature difference (False)
-        @param mcp_b: heat capacity of building mass [J/K]
-        @param mcp_h: heat capacity of transfer system [J/K]
+        @param tau_b: time constant of building in design point (s)
+        @param tau_h: time constant of heating system in design point (s)
         """
         self.t_a = t_a
+        self.t_a_design=t_a_design
         self.t_b = t_b
         self.q_design = q_design
+        self.PLC = PLC
         self.t_flow_design = t_flow_design
+        self.t_flow_plc =t_flow_plc
         self.const_flow = const_flow
         self.tau_b = tau_b
         self.tau_h = tau_h
@@ -137,11 +143,13 @@ class CalcParameters:
             self.delta_T_cond=self.q_design/(self.mass_flow*4183)
         else:
             self.delta_T_cond=delta_T_cond
-        self.ua_ba = self.q_design / (self.t_b - self.t_a)
-        self.ua_hb = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond - self.t_b)
+        self.ua_ba = self.q_design*self.PLC / (self.t_b - self.t_a)
+        self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
+        self.ua_ba_design = self.q_design / (self.t_b - self.t_a_design)
+        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond - self.t_b)
         self.t_start_h = self.t_flow_design - self.delta_T_cond
-        self.mcp_b = self.tau_b * self.ua_ba
-        self.mcp_h = self.tau_h * self.ua_hb
+        self.mcp_b = self.tau_b * self.ua_ba_design
+        self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
 
@@ -149,6 +157,10 @@ class CalcParameters:
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_design,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea)
-        print("Building created: Mass B = " + str(building.MassB.mcp) + " ua_ba = " + str(building.ua_ba) + "Mass H = "
-              + str(building.MassH.mcp) + " ua_hb = " + str(building.ua_hb))
+        print(
+         "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
+         " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
+         " time constant building = " + str(round(building.MassB.mcp/building.ua_ba, 2)) +
+         " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2))
+        )
         return building
