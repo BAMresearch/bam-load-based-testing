@@ -147,7 +147,7 @@ class CalcParameters:
         self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
         self.ua_ba_design = self.q_design / (self.t_b - self.t_a_design)
         self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond - self.t_b)
-        self.t_start_h = self.t_flow_design - self.delta_T_cond
+        self.t_start_h = self.t_flow_plc - self.delta_T_cond
         self.mcp_b = self.tau_b * self.ua_ba_design
         self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
