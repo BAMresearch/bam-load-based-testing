@@ -155,7 +155,7 @@ class CalcParameters:
 
     def createBuilding(self):
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
-                                   t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_design,
+                                   t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea)
         print(
          "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
