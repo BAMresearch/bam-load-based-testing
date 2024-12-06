@@ -11,7 +11,7 @@ t_b = 20 # constant building temperature
 
 ParaMTBui_E = CalcParameters(t_a_design=t_a_design, t_a=-10, q_design=q_design_e, PLC=1, tau_b=tau_b, tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=55, t_b=t_b, const_flow=True, mass_flow=mass_flow,
-                             boostHeat=True, maxPowBooHea=7000) # booster heater is active! # todo check
+                             boostHeat=True, maxPowBooHea=7000, volBufTank=100) # booster heater is active! # todo check
 MTBui_E = ParaMTBui_E.createBuilding()
 
 ParaMTBui_A = CalcParameters(t_a_design=t_a_design, t_a=-7, q_design=q_design_e, PLC=0.885, tau_b=tau_b, tau_h=tau_h,

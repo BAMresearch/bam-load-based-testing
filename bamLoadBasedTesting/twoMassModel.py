@@ -111,7 +111,7 @@ class TwoMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, mass_flow, delta_T_cond=5, const_flow=True,  tau_b=55E6/263,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0):
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, volBufTank = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
@@ -127,6 +127,7 @@ class CalcParameters:
         @param const_flow: True/False calculate parameters with given mass flow (True) or given temperature difference (False)
         @param tau_b: time constant of building in design point (s)
         @param tau_h: time constant of heating system in design point (s)
+        @param volBufTank: additional mass of water inside the virtual buffer tank (kg)
         """
         self.t_a = t_a
         self.t_a_design=t_a_design
@@ -141,15 +142,17 @@ class CalcParameters:
         self.mass_flow = mass_flow
         if const_flow:
             self.delta_T_cond=self.q_design*self.PLC/(self.mass_flow*4183)
+            self.delta_T_cond_design = self.q_design/(self.mass_flow*4183)
         else:
             self.delta_T_cond=delta_T_cond
+            self.delta_T_cond_design = delta_T_cond
         self.ua_ba = self.q_design*self.PLC / (self.t_b - self.t_a)
         self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
         self.ua_ba_design = self.q_design / (self.t_b - self.t_a_design)
-        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond - self.t_b)
+        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond_design - self.t_b)
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
         self.mcp_b = self.tau_b * self.ua_ba_design
-        self.mcp_h = self.tau_h * self.ua_hb_design
+        self.mcp_h = self.tau_h * self.ua_hb_design + volBufTank * 4183
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
 
