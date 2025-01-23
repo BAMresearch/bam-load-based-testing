@@ -1,11 +1,11 @@
 """Script to test 2-mass-building model"""
 
-from BuildingModels import BAM_RRT_3HP
+from BuildingModels import BAM_RRT_3HP_Bypass
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_3HP.MTBui_C
+Building = BAM_RRT_3HP_Bypass.MTBui_D
 stepSize = 1
 T_b = []
 T_H = []
@@ -17,18 +17,22 @@ q_flow_bh = []
 q_flow_int = []
 t = []
 t_sup = []
+m_flow_byp = []
+m_flow_hp = []
+m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-for x in range(3600*12):
+m_flow = 500/3600
+for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
     if x<3600*6:
-        t_sup.append(52)
+        t_sup.append(30)
     else:
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
     "Do step with Building Model"
-    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=720/3600, stepSize=stepSize, q_dot_int=internalGains)
+    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=m_flow, stepSize=stepSize, q_dot_int=internalGains)
     "Save current values:"
     T_b.append(Building.MassB.T)
     T_H.append(Building.MassH.T)
@@ -37,6 +41,9 @@ for x in range(3600*12):
     q_flow_hp.append(Building.q_dot_hp)
     q_flow_int.append(Building.q_dot_int)
     q_flow_bh.append(Building.q_dot_bh)
+    m_flow_byp.append(Building.virtualBypass.m_flow_byp)
+    m_flow_hp.append(m_flow)
+    m_flow_sh.append(Building.virtualBypass.m_flow_sh)
 
 hours = np.array(t)
 hours = hours/3600
@@ -65,6 +72,16 @@ fig, ax = plt.subplots()
 ax.plot(hours, T_b, label = 'building temperature')
 ax.legend()
 plt.ylabel('Temperature in °C')
+plt.xlabel('time in hours')
+plt.grid(True)
+plt.show()
+
+fig, ax = plt.subplots()
+ax.plot(hours, m_flow_byp, label = 'm_flow_bypass')
+ax.plot(hours, m_flow_sh, label = 'm_flow_sh')
+ax.plot(hours, m_flow_hp, label = 'm_flow_hp')
+ax.legend()
+plt.ylabel('mass flow in kg/s')
 plt.xlabel('time in hours')
 plt.grid(True)
 plt.show()
