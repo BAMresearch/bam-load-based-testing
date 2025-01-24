@@ -27,6 +27,6 @@ ParaMTBui_C = CalcParameters(t_a_design=t_a_design, t_a=7, q_design=q_design_e, 
 MTBui_C = ParaMTBui_C.createBuilding()
 
 ParaMTBui_D = CalcParameters(t_a_design=t_a_design, t_a=12, q_design=q_design_e, PLC=0.154, tau_b=tau_b, tau_h=tau_h,
-                             t_flow_design=t_flow_design, t_flow_plc=30, t_b=t_b, const_flow=False, mass_flow=mass_flow,
+                             t_flow_design=t_flow_design, t_flow_plc=30, t_b=t_b, const_flow=True, mass_flow=mass_flow,
                              virtualBypass=True, delta_T_cond=8)
 MTBui_D = ParaMTBui_D.createBuilding()
