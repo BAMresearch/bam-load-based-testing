@@ -22,7 +22,7 @@ m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = 500/3600
+m_flow = 900/3600
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"

@@ -190,7 +190,7 @@ class CalcParameters:
         self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
-        self.m_flow_sh_design = q_design*PLC / (self.delta_T_cond*4183)
+        self.m_flow_sh_design = q_design / (self.delta_T_cond*4183)
 
     def createBuilding(self):
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
