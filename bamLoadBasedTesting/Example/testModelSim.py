@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_3HP_Bypass.MTBui_D
+Building = BAM_RRT_3HP_Bypass.Bui_A_7
 stepSize = 1
 T_b = []
 T_H = []
@@ -22,12 +22,12 @@ m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = 900/3600
+m_flow = BAM_RRT_3HP_Bypass.mass_flow * 1.2
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
     if x<3600*6:
-        t_sup.append(30)
+        t_sup.append(36)
     else:
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
@@ -61,7 +61,7 @@ fig, ax = plt.subplots()
 ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
 ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
 ax.plot(hours, q_flow_ba, label = 'heat flow Building --> Ambient')
-ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
+#ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
 ax.legend()
 plt.ylabel('Heat flow in W')
 plt.xlabel('time in hours')
