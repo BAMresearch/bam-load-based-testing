@@ -141,12 +141,14 @@ class CalcParameters:
         self.mass_flow = mass_flow
         if const_flow:
             self.delta_T_cond=self.q_design*self.PLC/(self.mass_flow*4183)
+            delta_T_cond_design = self.q_design / (self.mass_flow * 4183)
         else:
             self.delta_T_cond=delta_T_cond
+            delta_T_cond_design = delta_T_cond
         self.ua_ba = self.q_design*self.PLC / (self.t_b - self.t_a)
         self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
         self.ua_ba_design = self.q_design / (self.t_b - self.t_a_design)
-        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*self.delta_T_cond - self.t_b)
+        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
         self.mcp_b = self.tau_b * self.ua_ba_design
         self.mcp_h = self.tau_h * self.ua_hb_design
