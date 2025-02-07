@@ -110,6 +110,7 @@ class TwoMassBuilding:
                 deltaT_bh = self.t_flow_design - t_sup
         else:
             self.q_dot_bh = 0
+            deltaT_bh = 0
 
 
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
