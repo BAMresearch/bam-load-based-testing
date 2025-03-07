@@ -15,6 +15,8 @@ Installation steps are:
 2. Install the package via pip. Use conda prompt console or the terminal within pycharm:
 `pip install -e <local path to git repo>`
 
+Test-Test
+
 ## Two-mass model
 
 The two-mass model consists of mass H, representing the heat transfer system, and mass B, representing the building envelope. 
