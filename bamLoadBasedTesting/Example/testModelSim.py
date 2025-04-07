@@ -1,11 +1,11 @@
 """Script to test 2-mass-building model"""
 
-from BuildingModels import BAM_RRT_3HP_Bypass
+from BuildingModels import BAM_RRT_3HP_HydSwi
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_3HP_Bypass.Bui_A_7
+Building = BAM_RRT_3HP_HydSwi.Bui_A_7
 stepSize = 1
 T_b = []
 T_H = []
@@ -17,12 +17,13 @@ q_flow_bh = []
 q_flow_int = []
 t = []
 t_sup = []
+T_sup_hs = []
 m_flow_byp = []
 m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = BAM_RRT_3HP_Bypass.mass_flow * 1.2
+m_flow = BAM_RRT_3HP_HydSwi.mass_flow * 0.9
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
@@ -36,21 +37,23 @@ for x in range(3600*6):
     "Save current values:"
     T_b.append(Building.MassB.T)
     T_H.append(Building.MassH.T)
+    T_sup_hs.append(Building.hydraulicSwitch.T_sup_swi)
     q_flow_ba.append(Building.q_dot_ba)
     q_flow_hb.append(Building.q_dot_hb)
     q_flow_hp.append(Building.q_dot_hp)
     q_flow_int.append(Building.q_dot_int)
     q_flow_bh.append(Building.q_dot_bh)
-    m_flow_byp.append(Building.virtualBypass.m_flow_byp)
+    m_flow_byp.append(Building.hydraulicSwitch.m_flow_swi)
     m_flow_hp.append(m_flow)
-    m_flow_sh.append(Building.virtualBypass.m_flow_sh)
+    m_flow_sh.append(Building.hydraulicSwitch.m_flow_sh)
 
 hours = np.array(t)
 hours = hours/3600
 fig, ax = plt.subplots()
 ax.plot(hours, T_ret, label = "return temperature")
 ax.plot(hours, T_H, label = 'transfer system temperature')
-ax.plot(hours, t_sup, label = 'supply temperature')
+ax.plot(hours, t_sup, label = 'supply temperature heat pump')
+ax.plot(hours, T_sup_hs, label = 'supply temperature transfer system')
 ax.legend()
 plt.grid(True)
 plt.ylabel('Temperature in °C')
