@@ -28,9 +28,43 @@ class ThermalMass:
         self.T = T
 
 
+class BypassValve:
+    def __init__(self, m_flow_design):
+        """
+        Virtual bypass valve
+        :param m_flow_design:
+        """
+        self.m_flow_design = m_flow_design
+        self.m_flow_sh = 0
+        self.m_flow_byp = 0
+        self.T_ret_byp = 0
+
+
+    def calcFlows(self, m_flow_hp, T_sup_hp, T_ret_sh):
+        """
+        Calculates mass flows and temperatures behind bypass valve
+        :param m_flow_hp:
+        :param T_sup_hp:
+        :param T_ret_sh:
+        :return:
+        """
+        if m_flow_hp <= self.m_flow_design:
+            self.m_flow_sh = m_flow_hp
+        else:
+            self.m_flow_sh = self.m_flow_design
+
+        self.m_flow_byp = m_flow_hp-self.m_flow_sh
+        if m_flow_hp == 0:
+            self.T_ret_byp = T_ret_sh
+        else:
+            self.T_ret_byp = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_byp)/m_flow_hp
+
+
+
+
 class TwoMassBuilding:
-    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, t_start_b=20,
-                 boostHeat = False, maxPowBooHea = 0):
+    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, m_flow_sh_design, t_start_b=20,
+                 boostHeat = False, maxPowBooHea = 0, virtualBypass = False, relHum = 0):
         """
         Init function, use either °C or K but not use both
         :param ua_hb: thermal conductivity [W/K] between transfer system (H) and Building (B)
@@ -43,9 +77,11 @@ class TwoMassBuilding:
         """
         self.MassH = ThermalMass(mcp_h, t_start_h)
         self.MassB = ThermalMass(mcp_b, t_start_b)
+        self.virtualBypass = BypassValve(m_flow_sh_design)
         self.ua_hb = ua_hb
         self.ua_ba = ua_ba
         self.t_a = t_a
+        self.relHum = relHum
         self.boostHeat = boostHeat
         self.q_dot_hp = 0
         self.q_dot_hb = 0
@@ -55,6 +91,7 @@ class TwoMassBuilding:
         self.t_ret = t_start_h
         self.t_flow_design = t_flow_design
         self.maxPowBooHea = maxPowBooHea
+        self.TagBypass = virtualBypass
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
         """
@@ -68,9 +105,14 @@ class TwoMassBuilding:
             self.q_dot_bh = m_dot*4183*(self.t_flow_design-t_sup)
             if self.q_dot_bh > self.maxPowBooHea:
                 self.q_dot_bh = self.maxPowBooHea
+                deltaT_bh = (self.q_dot_bh / (m_dot * 4183))
+            else:
+                deltaT_bh = self.t_flow_design - t_sup
         else:
             self.q_dot_bh = 0
-        deltaT_bh = (self.q_dot_bh/(m_dot*4183))
+            deltaT_bh = 0
+
+
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
         self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
         self.q_dot_ba = self.ua_ba * (self.MassB.T - self.t_a)
@@ -83,7 +125,10 @@ class TwoMassBuilding:
         :param t_sup: current supply temperature
         :return: return temperature
         """
-        t_ret = self.MassH.T
+        if self.TagBypass:
+            t_ret = self.virtualBypass.T_ret_byp
+        else:
+            t_ret = self.MassH.T
         return t_ret
 
     def doStep(self, t_sup, t_ret_mea, m_dot, stepSize, q_dot_int = 0):
@@ -99,6 +144,7 @@ class TwoMassBuilding:
         :param q_dot_int: internal gain heat flow directly into building mass [W]
         :param boostHeat: virtual booster heater that increases temperature to set temperature
         """
+        self.virtualBypass.calcFlows(m_flow_hp=m_dot, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_dot, t_sup=t_sup, t_ret_mea=t_ret_mea)
@@ -110,8 +156,8 @@ class TwoMassBuilding:
         self.t_ret = self.calc_return(t_sup)
 
 class CalcParameters:
-    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, mass_flow, delta_T_cond=5, const_flow=True,  tau_b=55E6/263,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0):
+    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, mass_flow, delta_T_cond=8, const_flow=True,  tau_b=55E6/263,
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, virtualBypass = False, relHum = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
@@ -129,6 +175,7 @@ class CalcParameters:
         @param tau_h: time constant of heating system in design point (s)
         """
         self.t_a = t_a
+        self.relHum = relHum
         self.t_a_design=t_a_design
         self.t_b = t_b
         self.q_design = q_design
@@ -138,6 +185,7 @@ class CalcParameters:
         self.const_flow = const_flow
         self.tau_b = tau_b
         self.tau_h = tau_h
+        self.virtualBypass = virtualBypass
         self.mass_flow = mass_flow
         if const_flow:
             self.delta_T_cond=self.q_design*self.PLC/(self.mass_flow*4183)
@@ -152,11 +200,13 @@ class CalcParameters:
         self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
+        self.m_flow_sh_design = self.mass_flow
 
     def createBuilding(self):
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_plc,
-                                   boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea)
+                                   boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
+                                   m_flow_sh_design=self.m_flow_sh_design, virtualBypass=self.virtualBypass, relHum = self.relHum)
         print(
          "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
