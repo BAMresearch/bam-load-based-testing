@@ -1,6 +1,7 @@
 """This model is used to calculate the return flow of a building according to the compensation load method
 in project EBC0955_DBU_Testmethoden_KAP_GES
 @author: Stephan Göbel, date: 2023-01"""
+import warnings
 
 
 class ThermalMass:
@@ -60,11 +61,43 @@ class BypassValve:
             self.T_ret_byp = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_byp)/m_flow_hp
 
 
+class HydraulicSwitch:
+    def __init__(self, m_flow_design):
+        """
+        Virtual bypass valve
+        :param m_flow_design:
+        """
+        self.m_flow_design = m_flow_design
+        self.m_flow_sh = 0
+        self.m_flow_swi = 0
+        self.T_ret_swi = 0
+        self.T_sup_swi = 0
+
+    def calcFlows(self, m_flow_hp, T_sup_hp, T_ret_sh):
+        """
+        Calculates mass flows and temperatures behind hydraulic switch valve
+        :param m_flow_hp:
+        :param T_sup_hp:
+        :param T_ret_sh:
+        :return:
+        """
+        self.m_flow_sh = self.m_flow_design # m_flow heating system always equal to m_flow design
+        self.m_flow_swi = m_flow_hp-self.m_flow_sh # m_flow through hydraulic switch > 0 if hp flow higher than design
+        if m_flow_hp == 0: # hp off
+            self.T_ret_swi = T_ret_sh
+        elif self.m_flow_swi >= 0:  # heat pump delivers equal or more mass flow than design flow
+            self.T_ret_swi = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_swi)/m_flow_hp
+            self.T_sup_swi = T_sup_hp
+        elif self.m_flow_swi < 0:  # heat pump delivers less mass flow than design flow
+            self.T_ret_swi = T_ret_sh
+            self.T_sup_swi = (m_flow_hp*T_sup_hp - self.m_flow_swi*T_ret_sh)/self.m_flow_sh
+
+
 
 
 class TwoMassBuilding:
     def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, m_flow_sh_design, t_start_b=20,
-                 boostHeat = False, maxPowBooHea = 0, virtualBypass = False, relHum = 0):
+                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, virtualBypass = False, relHum = 0):
         """
         Init function, use either °C or K but not use both
         :param ua_hb: thermal conductivity [W/K] between transfer system (H) and Building (B)
@@ -77,7 +110,8 @@ class TwoMassBuilding:
         """
         self.MassH = ThermalMass(mcp_h, t_start_h)
         self.MassB = ThermalMass(mcp_b, t_start_b)
-        self.virtualBypass = BypassValve(m_flow_sh_design)
+        self.virtualBypass = BypassValve(m_flow_design = m_flow_sh_design)
+        self.hydraulicSwitch = HydraulicSwitch(m_flow_design=m_flow_sh_design)
         self.ua_hb = ua_hb
         self.ua_ba = ua_ba
         self.t_a = t_a
@@ -92,6 +126,7 @@ class TwoMassBuilding:
         self.t_flow_design = t_flow_design
         self.maxPowBooHea = maxPowBooHea
         self.TagBypass = virtualBypass
+        self.TagHydSwi = hydraulicSwitch
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
         """
@@ -114,7 +149,10 @@ class TwoMassBuilding:
 
 
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
-        self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
+        if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
+            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.MassB.T)
+        else:
+            self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
         self.q_dot_ba = self.ua_ba * (self.MassB.T - self.t_a)
 
 
@@ -125,7 +163,9 @@ class TwoMassBuilding:
         :param t_sup: current supply temperature
         :return: return temperature
         """
-        if self.TagBypass:
+        if self.TagHydSwi:
+            t_ret = self.hydraulicSwitch.T_ret_swi
+        elif self.TagBypass:
             t_ret = self.virtualBypass.T_ret_byp
         else:
             t_ret = self.MassH.T
@@ -145,6 +185,7 @@ class TwoMassBuilding:
         :param boostHeat: virtual booster heater that increases temperature to set temperature
         """
         self.virtualBypass.calcFlows(m_flow_hp=m_dot, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
+        self.hydraulicSwitch.calcFlows(m_flow_hp=m_dot, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_dot, t_sup=t_sup, t_ret_mea=t_ret_mea)
@@ -157,7 +198,7 @@ class TwoMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, mass_flow, delta_T_cond=8, const_flow=True,  tau_b=55E6/263,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, virtualBypass = False, relHum = 0):
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, virtualBypass = False, relHum = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
@@ -186,6 +227,7 @@ class CalcParameters:
         self.tau_b = tau_b
         self.tau_h = tau_h
         self.virtualBypass = virtualBypass
+        self.hydraulicSwitch = hydraulicSwitch
         self.mass_flow = mass_flow
         if const_flow:
             self.delta_T_cond=self.q_design*self.PLC/(self.mass_flow*4183)
@@ -208,11 +250,13 @@ class CalcParameters:
         building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
-                                   m_flow_sh_design=self.m_flow_sh_design, virtualBypass=self.virtualBypass, relHum = self.relHum)
+                                   m_flow_sh_design=self.m_flow_sh_design, hydraulicSwitch=self.hydraulicSwitch, virtualBypass=self.virtualBypass, relHum = self.relHum)
         print(
          "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
          " time constant building = " + str(round(building.MassB.mcp/building.ua_ba, 2)) +
          " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2))
         )
+        if self.hydraulicSwitch == True and self.virtualBypass == True:
+            warnings.warn('Hydraulic switch and bypass valve = true, hydraulic switch is used!')
         return building
