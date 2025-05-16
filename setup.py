@@ -22,7 +22,7 @@ INSTALL_REQUIRES = ["numpy",
 SETUP_REQUIRES = INSTALL_REQUIRES.copy()
 
 setuptools.setup(name="bamLoadBasedTesting",
-                 version="0.1.0",
+                 version="0.25.0",
                  description="Package for load-based-testing with two-mass-model.",
                  long_description=long_description,
                  long_description_content_type="text/markdown",
@@ -32,11 +32,12 @@ setuptools.setup(name="bamLoadBasedTesting",
                               "Programming Language :: Python :: 3.7",
                               "Programming Language :: Python :: 3.8",
                               "Programming Language :: Python :: 3.9",
-                              "Programming Language :: Python :: 3.10"
+                              "Programming Language :: Python :: 3.10",
+                              "Programming Language :: Python :: 3.11",
+                              "Programming Language :: Python :: 3.12"                              
                               ],
                  packages=setuptools.find_packages(exclude=[""]),
                  setup_requires=SETUP_REQUIRES,
                  install_requires=INSTALL_REQUIRES,
-                 package_data={'': ['REFPRP64.DLL', "hfcmech_v13all.cti"]},
                  include_package_data=True
                  )

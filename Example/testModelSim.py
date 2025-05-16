@@ -1,11 +1,12 @@
 """Script to test 2-mass-building model"""
 
-from BuildingModels import BAM_RRT_3HP_HydSwi
+from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_fixedflow
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_3HP_HydSwi.Bui_A_7
+comBui = BAM_RRT_HP3_fixedflow
+Building = comBui.MTBui_D
 stepSize = 1
 T_b = []
 T_H = []
@@ -23,17 +24,19 @@ m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = BAM_RRT_3HP_HydSwi.mass_flow * 0.9
+m_flow = comBui.m_dot_H_design
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
     if x<3600*6:
-        t_sup.append(36)
+        t_sup.append(30)
     else:
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
     "Do step with Building Model"
-    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_dot=m_flow, stepSize=stepSize, q_dot_int=internalGains)
+    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_w_hp=m_flow, stepSize=stepSize, q_dot_int=internalGains)
+    if x==0:
+        print("Start value for return temperature " + str(T_ret[-1]) + " °C")
     "Save current values:"
     T_b.append(Building.MassB.T)
     T_H.append(Building.MassH.T)
