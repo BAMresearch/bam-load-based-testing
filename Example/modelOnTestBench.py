@@ -1,4 +1,4 @@
-from BuildingModels import BAM_RRT_HP3_variableflow_8Kcalc
+from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_variableflow_8Kcalc
 import time
 
 # Step Size

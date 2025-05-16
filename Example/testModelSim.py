@@ -1,11 +1,12 @@
 """Script to test 2-mass-building model"""
 
-from BuildingModels import BAM_RRT_HP3_variableflow_8Kcalc
+from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_fixedflow
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-Building = BAM_RRT_HP3_variableflow_8Kcalc.MTBui_D
+comBui = BAM_RRT_HP3_fixedflow
+Building = comBui.MTBui_D
 stepSize = 1
 T_b = []
 T_H = []
@@ -23,7 +24,7 @@ m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = BAM_RRT_HP3_variableflow_8Kcalc.m_dot_H_design
+m_flow = comBui.m_dot_H_design
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
