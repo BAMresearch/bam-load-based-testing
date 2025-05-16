@@ -2,7 +2,7 @@ from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_variableflow_8Kcalc
 import time
 
 # Step Size
-stepSize = 1
+stepSize = 1  #ToDo: Allign step size with your own step size
 
 # Create Reduced building
 BamBuilding = BAM_RRT_HP3_variableflow_8Kcalc.MTBui_A
