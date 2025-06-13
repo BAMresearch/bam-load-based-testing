@@ -149,11 +149,12 @@ class TwoMassBuilding:
 
 
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
-        if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
-            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.MassB.T)
-        else:
-            self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
-        self.q_dot_ba = self.ua_ba * (self.MassB.T - self.t_a)
+        # if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
+        #     self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.MassB.T)
+        # else:
+        #     self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
+        self.q_dot_hb = self.ua_ba * (self.MassB.T - self.t_a)
+        self.q_dot_ba = self.q_dot_hb
 
 
     def calc_return(self, t_sup):
