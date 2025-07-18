@@ -152,8 +152,8 @@ class OneMassBuilding:
         self.t_ret = self.calc_return(t_sup)
 
 class CalcParameters:
-    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design, delta_T_cond=8, const_flow=True,  tau_b=55E6/263,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, virtualBypass = False, relHum = 0):
+    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
         """
         Calculate paramters for two mass building model according to given parameters of a heat pump.
         Either a mass flow or a temperature difference on condenser has to be provided.
@@ -171,6 +171,7 @@ class CalcParameters:
         @param tau_h: time constant of heating system in design point (s)
         """
         self.t_a = t_a
+        self.m_dot_H_design = m_dot_H_design
         self.relHum = relHum
         self.t_a_design=t_a_design
         self.t_b = t_b
@@ -178,37 +179,28 @@ class CalcParameters:
         self.PLC = PLC
         self.t_flow_design = t_flow_design
         self.t_flow_plc =t_flow_plc
-        self.const_flow = const_flow
         self.tau_h = tau_h
         self.hydraulicSwitch = hydraulicSwitch
-        self.m_dot_H_design = m_dot_H_design
-        if const_flow:
-            self.delta_T_cond=self.q_design*self.PLC/(self.m_dot_H_design*4183)
-            delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)
-        else:
-            self.delta_T_cond=delta_T_cond
-            delta_T_cond_design = delta_T_cond
-        self.ua_ba = self.q_design*self.PLC / (self.t_b - self.t_a)
+        #Mass flow in config configured
+        self.delta_T_cond=self.q_design*self.PLC/(self.m_dot_H_design*4183)
+        delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)
         self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
-        self.ua_ba_design = self.q_design / (self.t_b - self.t_a_design)
         self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
-        self.mcp_b = self.tau_b * self.ua_ba_design
         self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
 
     def createBuilding(self):
-        building = TwoMassBuilding(ua_hb=self.ua_hb, ua_ba=self.ua_ba, mcp_h=self.mcp_h, mcp_b=self.mcp_b, t_a=self.t_a,
-                                   t_start_h=self.t_start_h, t_start_b=self.t_b, t_flow_design=self.t_flow_plc,
+        building = OneMassBuilding(ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
+                                   t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
-                                   m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch, virtualBypass=self.virtualBypass, relHum = self.relHum)
+                                   m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
+                                   relHum = self.relHum)
         print(
          "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
          " time constant building = " + str(round(building.MassB.mcp/building.ua_ba, 2)) +
          " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2))
         )
-        if self.hydraulicSwitch == True and self.virtualBypass == True:
-            warnings.warn('Hydraulic switch and bypass valve = true, hydraulic switch is used!')
         return building
