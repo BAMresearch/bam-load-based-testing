@@ -126,8 +126,6 @@ class OneMassBuilding:
         """
         if self.TagHydSwi:
             t_ret = self.hydraulicSwitch.T_ret_swi
-        elif self.TagBypass:
-            t_ret = self.virtualBypass.T_ret_byp
         else:
             t_ret = self.MassH.T
         return t_ret
@@ -143,17 +141,13 @@ class OneMassBuilding:
         :param stepSize [s]
         :param t_ret_mea: measured value of return temperature [°C]
         :param q_dot_int: internal gain heat flow directly into building mass [W]
-        :param boostHeat: virtual booster heater that increases temperature to set temperature
         """
-        self.virtualBypass.calcFlows(m_flow_hp=m_w_hp, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
         self.hydraulicSwitch.calcFlows(m_flow_hp=m_w_hp, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_w_hp, t_sup=t_sup, t_ret_mea=t_ret_mea)
         # heat flow heat pump & booster heater - heat flow H-->B
         self.MassH.qflow((self.q_dot_hp + self.q_dot_bh - self.q_dot_hb)*stepSize)
-        # heat flow H-->B - heat flow B-->A + heat flow internal gain
-        self.MassB.qflow((self.q_dot_hb - self.q_dot_ba + self.q_dot_int)*stepSize)
         #  calculate new return temperature
         self.t_ret = self.calc_return(t_sup)
 
@@ -185,9 +179,7 @@ class CalcParameters:
         self.t_flow_design = t_flow_design
         self.t_flow_plc =t_flow_plc
         self.const_flow = const_flow
-        self.tau_b = tau_b
         self.tau_h = tau_h
-        self.virtualBypass = virtualBypass
         self.hydraulicSwitch = hydraulicSwitch
         self.m_dot_H_design = m_dot_H_design
         if const_flow:
