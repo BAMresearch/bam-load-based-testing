@@ -29,38 +29,6 @@ class ThermalMass:
         self.T = T
 
 
-class BypassValve:
-    def __init__(self, m_flow_design):
-        """
-        Virtual bypass valve
-        :param m_flow_design:
-        """
-        self.m_flow_design = m_flow_design
-        self.m_flow_sh = 0
-        self.m_flow_byp = 0
-        self.T_ret_byp = 0
-
-
-    def calcFlows(self, m_flow_hp, T_sup_hp, T_ret_sh):
-        """
-        Calculates mass flows and temperatures behind bypass valve
-        :param m_flow_hp:
-        :param T_sup_hp:
-        :param T_ret_sh:
-        :return:
-        """
-        if m_flow_hp <= self.m_flow_design:
-            self.m_flow_sh = m_flow_hp
-        else:
-            self.m_flow_sh = self.m_flow_design
-
-        self.m_flow_byp = m_flow_hp-self.m_flow_sh
-        if m_flow_hp == 0:
-            self.T_ret_byp = T_ret_sh
-        else:
-            self.T_ret_byp = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_byp)/m_flow_hp
-
-
 class HydraulicSwitch:
     def __init__(self, m_flow_design):
         """
@@ -93,10 +61,8 @@ class HydraulicSwitch:
             self.T_sup_swi = (m_flow_hp*T_sup_hp - self.m_flow_swi*T_ret_sh)/self.m_flow_sh
 
 
-
-
-class TwoMassBuilding:
-    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, m_dot_H_design, t_start_b=20,
+class OneMassBuilding:
+    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, m_dot_H_design, t_b_design=20,
                  boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, virtualBypass = False, relHum = 0):
         """
         Init function, use either °C or K but not use both
@@ -105,16 +71,14 @@ class TwoMassBuilding:
         :param mcp_h: heat capacity transfer system [J/kg K]
         :param t_start_h: initial temperature transfer system (H) [°C / K]
         :param mcp_b: heat capacity building [J/ kg K]
-        :param t_start_b: initial temperature building [°C / K]
+        :param t_b_design: constant building temperature [°C / K]
         :param t_a: ambient temperature [°C / K]
         """
         self.MassH = ThermalMass(mcp_h, t_start_h)
-        self.MassB = ThermalMass(mcp_b, t_start_b)
-        self.virtualBypass = BypassValve(m_flow_design = m_dot_H_design)
         self.hydraulicSwitch = HydraulicSwitch(m_flow_design=m_dot_H_design)
         self.ua_hb = ua_hb
-        self.ua_ba = ua_ba
         self.t_a = t_a
+        self.t_b_design = t_b_design
         self.relHum = relHum
         self.boostHeat = boostHeat
         self.q_dot_hp = 0
@@ -125,7 +89,6 @@ class TwoMassBuilding:
         self.t_ret = t_start_h
         self.t_flow_design = t_flow_design
         self.maxPowBooHea = maxPowBooHea
-        self.TagBypass = virtualBypass
         self.TagHydSwi = hydraulicSwitch
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
@@ -150,11 +113,9 @@ class TwoMassBuilding:
 
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
         if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
-            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.MassB.T)
+            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.t_b_design)
         else:
-            self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.MassB.T)
-        self.q_dot_ba = self.ua_ba * (self.MassB.T - self.t_a)
-
+            self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.t_b_design)
 
     def calc_return(self, t_sup):
         """
