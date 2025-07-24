@@ -62,8 +62,8 @@ class HydraulicSwitch:
 
 
 class OneMassBuilding:
-    def __init__(self, ua_hb, ua_ba, mcp_h,  mcp_b, t_a, t_start_h, t_flow_design, m_dot_H_design, t_b_design=20,
-                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, virtualBypass = False, relHum = 0):
+    def __init__(self, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, t_b_design=20,
+                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
         """
         Init function, use either °C or K but not use both
         :param ua_hb: thermal conductivity [W/K] between transfer system (H) and Building (B)
