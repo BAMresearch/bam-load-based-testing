@@ -198,9 +198,8 @@ class CalcParameters:
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
                                    relHum = self.relHum)
         print(
-         "Building created: Mass B = " + str(round(building.MassB.mcp,2)) + " ua_ba = " + str(round(building.ua_ba,2)) +
+         "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
-         " time constant building = " + str(round(building.MassB.mcp/building.ua_ba, 2)) +
          " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2))
         )
         return building
