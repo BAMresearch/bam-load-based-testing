@@ -1,8 +1,6 @@
 """This model is used to calculate the return flow of a building according to the compensation load method
-in project EBC0955_DBU_Testmethoden_KAP_GES
-@author: Stephan Göbel, date: 2023-01"""
+@author: Stephan Göbel, date: 2025-07"""
 import warnings
-
 
 class ThermalMass:
     def __init__(self, mcp, T_start):
@@ -30,7 +28,7 @@ class ThermalMass:
 
 
 class HydraulicSwitch:
-    def __init__(self, m_flow_design):
+    def __init__(self, m_flow_design, hydraulicSwitch):
         """
         Virtual bypass valve
         :param m_flow_design:
@@ -40,6 +38,7 @@ class HydraulicSwitch:
         self.m_flow_swi = 0
         self.T_ret_swi = 0
         self.T_sup_swi = 0
+        self.hydraulicSwitch = hydraulicSwitch
 
     def calcFlows(self, m_flow_hp, T_sup_hp, T_ret_sh):
         """
@@ -49,20 +48,25 @@ class HydraulicSwitch:
         :param T_ret_sh:
         :return:
         """
-        self.m_flow_sh = self.m_flow_design # m_flow heating system always equal to m_flow design
-        self.m_flow_swi = m_flow_hp-self.m_flow_sh # m_flow through hydraulic switch > 0 if hp flow higher than design
-        if m_flow_hp == 0: # hp off
+        if self.hydraulicSwitch:
+            self.m_flow_sh = self.m_flow_design # m_flow heating system always equal to m_flow design
+            self.m_flow_swi = m_flow_hp-self.m_flow_sh # m_flow through hydraulic switch > 0 if hp flow higher than design
+            if m_flow_hp == 0: # hp off
+                self.T_ret_swi = T_ret_sh
+            elif self.m_flow_swi >= 0:  # heat pump delivers equal or more mass flow than design flow
+                self.T_ret_swi = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_swi)/m_flow_hp
+                self.T_sup_swi = T_sup_hp
+            elif self.m_flow_swi < 0:  # heat pump delivers less mass flow than design flow
+                self.T_ret_swi = T_ret_sh
+                self.T_sup_swi = (m_flow_hp*T_sup_hp - self.m_flow_swi*T_ret_sh)/self.m_flow_sh
+        else:
+            self.m_flow_swi = 0
             self.T_ret_swi = T_ret_sh
-        elif self.m_flow_swi >= 0:  # heat pump delivers equal or more mass flow than design flow
-            self.T_ret_swi = (T_ret_sh*self.m_flow_sh + T_sup_hp * self.m_flow_swi)/m_flow_hp
             self.T_sup_swi = T_sup_hp
-        elif self.m_flow_swi < 0:  # heat pump delivers less mass flow than design flow
-            self.T_ret_swi = T_ret_sh
-            self.T_sup_swi = (m_flow_hp*T_sup_hp - self.m_flow_swi*T_ret_sh)/self.m_flow_sh
 
 
 class OneMassBuilding:
-    def __init__(self, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, t_b_design=20,
+    def __init__(self, q_design_plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
                  boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
         """
         Init function, use either °C or K but not use both
@@ -74,17 +78,17 @@ class OneMassBuilding:
         :param t_b_design: constant building temperature [°C / K]
         :param t_a: ambient temperature [°C / K]
         """
+        self.q_design_plc = q_design_plc
         self.MassH = ThermalMass(mcp_h, t_start_h)
-        self.hydraulicSwitch = HydraulicSwitch(m_flow_design=m_dot_H_design)
+        self.hydraulicSwitch = HydraulicSwitch(m_flow_design=m_dot_H_design, hydraulicSwitch=hydraulicSwitch)
         self.ua_hb = ua_hb
         self.t_a = t_a
         self.t_b_design = t_b_design
+        self.T_mean = T_mean
         self.relHum = relHum
         self.boostHeat = boostHeat
         self.q_dot_hp = 0
         self.q_dot_hb = 0
-        self.q_dot_ba = 0
-        self.q_dot_int = 0
         self.q_dot_bh = 0
         self.t_ret = t_start_h
         self.t_flow_design = t_flow_design
@@ -170,6 +174,7 @@ class CalcParameters:
         @param tau_b: time constant of building in design point (s)
         @param tau_h: time constant of heating system in design point (s)
         """
+        self.q_design_plc = q_design*PLC
         self.t_a = t_a
         self.m_dot_H_design = m_dot_H_design
         self.relHum = relHum
@@ -184,6 +189,7 @@ class CalcParameters:
         #Mass flow in config configured
         self.delta_T_cond=self.q_design*self.PLC/(self.m_dot_H_design*4183)
         delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)
+        self.T_mean = t_flow_plc - 0.5 * self.delta_T_cond
         self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
         self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
@@ -192,11 +198,11 @@ class CalcParameters:
         self.maxPowBooHea = maxPowBooHea
 
     def createBuilding(self):
-        building = OneMassBuilding(ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
+        building = OneMassBuilding(q_design_plc = self.q_design_plc, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
-                                   relHum = self.relHum)
+                                   relHum = self.relHum, T_mean = self.T_mean)
         print(
          "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
