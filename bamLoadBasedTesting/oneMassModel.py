@@ -94,6 +94,7 @@ class OneMassBuilding:
         self.t_flow_design = t_flow_design
         self.maxPowBooHea = maxPowBooHea
         self.TagHydSwi = hydraulicSwitch
+        self.deltaBH = 0 # virtual booster heater delta T
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
         """
@@ -107,19 +108,19 @@ class OneMassBuilding:
             self.q_dot_bh = m_dot*4183*(self.t_flow_design-t_sup)
             if self.q_dot_bh > self.maxPowBooHea:
                 self.q_dot_bh = self.maxPowBooHea
-                deltaT_bh = (self.q_dot_bh / (m_dot * 4183))
+                self.deltaBH = (self.q_dot_bh / (m_dot * 4183))
             else:
-                deltaT_bh = self.t_flow_design - t_sup
+                self.deltaBH = self.t_flow_design - t_sup
         else:
             self.q_dot_bh = 0
-            deltaT_bh = 0
+            self.deltaBH = 0
 
 
         self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
         if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
-            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + deltaT_bh + self.MassH.T) / 2 - self.t_b_design)
+            self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + self.MassH.T) / 2 - self.t_b_design)
         else:
-            self.q_dot_hb = self.ua_hb * ((t_sup+deltaT_bh+self.MassH.T)/2 - self.t_b_design)
+            self.q_dot_hb = self.ua_hb * ((t_sup+self.deltaBH+self.MassH.T)/2 - self.t_b_design)
 
     def calc_return(self, t_sup):
         """
@@ -146,7 +147,7 @@ class OneMassBuilding:
         :param t_ret_mea: measured value of return temperature [°C]
         :param q_dot_int: internal gain heat flow directly into building mass [W]
         """
-        self.hydraulicSwitch.calcFlows(m_flow_hp=m_w_hp, T_sup_hp=t_sup, T_ret_sh=self.MassH.T)
+        self.hydraulicSwitch.calcFlows(m_flow_hp=m_w_hp, T_sup_hp=t_sup+self.deltaBH, T_ret_sh=self.MassH.T)
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_w_hp, t_sup=t_sup, t_ret_mea=t_ret_mea)
