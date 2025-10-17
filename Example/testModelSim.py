@@ -1,12 +1,12 @@
-"""Script to test 2-mass-building model"""
+"""Script to test 1-mass-building model"""
 
-from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_fixedflow
+from bamLoadBasedTesting.BuildingModels import OneMassModelConfig
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Create new building model:
-comBui = BAM_RRT_HP3_fixedflow
-Building = comBui.MTBui_D
+comBui = OneMassModelConfig
+Building = comBui.MTBui_A
 stepSize = 1
 T_b = []
 T_H = []
@@ -24,12 +24,12 @@ m_flow_hp = []
 m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
-m_flow = comBui.m_dot_H_design
+m_flow = comBui.mass_flow_design
 for x in range(3600*6):
     t.append(x * stepSize)
     "Step response"
-    if x<3600*6:
-        t_sup.append(30)
+    if x<3600*3:
+        t_sup.append(52)
     else:
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
@@ -38,10 +38,8 @@ for x in range(3600*6):
     if x==0:
         print("Start value for return temperature " + str(T_ret[-1]) + " °C")
     "Save current values:"
-    T_b.append(Building.MassB.T)
     T_H.append(Building.MassH.T)
     T_sup_hs.append(Building.hydraulicSwitch.T_sup_swi)
-    q_flow_ba.append(Building.q_dot_ba)
     q_flow_hb.append(Building.q_dot_hb)
     q_flow_hp.append(Building.q_dot_hp)
     q_flow_int.append(Building.q_dot_int)
@@ -66,18 +64,9 @@ plt.show()
 fig, ax = plt.subplots()
 ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
 ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
-ax.plot(hours, q_flow_ba, label = 'heat flow Building --> Ambient')
 #ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
 ax.legend()
 plt.ylabel('Heat flow in W')
-plt.xlabel('time in hours')
-plt.grid(True)
-plt.show()
-
-fig, ax = plt.subplots()
-ax.plot(hours, T_b, label = 'building temperature')
-ax.legend()
-plt.ylabel('Temperature in °C')
 plt.xlabel('time in hours')
 plt.grid(True)
 plt.show()

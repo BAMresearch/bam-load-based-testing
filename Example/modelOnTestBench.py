@@ -1,11 +1,11 @@
-from bamLoadBasedTesting.BuildingModels import BAM_RRT_HP3_variableflow_8Kcalc
+from bamLoadBasedTesting.BuildingModels import OneMassModelConfig
 import time
 
 # Step Size
 stepSize = 1  #ToDo: Allign step size with your own step size
 
 # Create Reduced building
-BamBuilding = BAM_RRT_HP3_variableflow_8Kcalc.MTBui_F
+BamBuilding = OneMassModelConfig.MTBui_A
 
 while True:
     t1 = time.time()
@@ -22,10 +22,8 @@ while True:
           " m_flow : " + str(round(m_w_hp, 2)) +
           " Return Temperature: " + str(round(BamBuilding.t_ret, 2)))
     print(" T_H = " + str(round(BamBuilding.MassH.T, 2)) +
-          " T_B = " + str(round(BamBuilding.MassB.T, 2)) +
           " q_flow_hp = " + str(round(BamBuilding.q_dot_hp, 2)) +
-          " q_flow_hb = " + str(round(BamBuilding.q_dot_hb, 2)) +
-          " q_flow_ba = " + str(round(BamBuilding.q_dot_ba, 2)))
+          " q_flow_hb = " + str(round(BamBuilding.q_dot_hb, 2)))
 
     "Sleep to run in real time"
     t2 = time.time()

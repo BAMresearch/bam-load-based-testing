@@ -15,34 +15,24 @@ Installation steps are:
 2. Install the package via pip. Use conda prompt console or the terminal within pycharm:
 `pip install -e <local path to git repo>`
 
-## Two-mass model
+## One-mass model
 
-The two-mass model consists of mass H, representing the heat transfer system, and mass B, representing the building envelope. 
-Each mass is characterized by a heat capacity MCp and an initial temperature $`\vartheta_\mathrm{start}`$. 
+The one-mass model consists of mass H, representing the heat transfer system.
+The mass is characterized by a heat capacity MCp and an initial temperature $`\vartheta_\mathrm{start}`$. 
 
-The heat output provided by the heat pump is delivered to mass H. Mass H is connected to mass B, so a heat exchange occurs between mass H and mass B.
-Depending on the temperatures of the masses and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat pump the heat flow is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the masses:
+The heat output provided by the heat pump is delivered to mass H. Mass H is connected to a building with a constant temperature of 20 °C.
+Depending on the temperatures of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat pump the heat flow is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the masses:
 
 $`\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB}\left( \frac{\vartheta_\mathrm{S} + \vartheta_\mathrm{H}}{2} - \vartheta_\mathrm{B} \right)`$
 
-Mass B also exchanges heat with the environment.
-The environment is represented by a constant ambient temperature $`\vartheta_\mathrm{A}`$.
-The heat flow between mass B and the environment follows the equation:
-
-$`\dot{Q}_\mathrm{BA} =  UA_\mathrm{BA}\left(  \vartheta_\mathrm{B} - \vartheta_\mathrm{A}\right)`$
 
 The associated energy balances of the subsystems determine the temperature changes of masses H and B:
 
 $`\frac{\mathrm{d}\vartheta_\mathrm{H}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HP} - \dot{Q}_\mathrm{HB}}{C_\mathrm{H}}`$
 
-$`\frac{\mathrm{d}\vartheta_\mathrm{B}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HB} - \dot{Q}_\mathrm{BA}}{C_\mathrm{B}}`$
-
 The return temperature $`\vartheta_\mathrm{R}`$ of the heat pump corresponds to the temperature $`\vartheta_\mathrm{H}`$ of mass H.
 
-![img.png](model.png "two-mass building model")
-
 ## Implementation in python
-
 
 The building model is defined in the class "TwoMassBuilding" in "twoMassModel.py" and consists of two objects of the class "ThermalMass".
 
@@ -54,8 +44,6 @@ Parameterized building models for the BAM Round Robin Test can be found in the f
 All input parameters are in SI units. \
 `q_design_e in Watt: - parameter has to be set, design heating power in PLC E` 
 
-`tau_b in seconds - constant, time constant of building envelope`
-
 `tau_h in seconds - constant, time constant of transfer system`
 
 `mass_flow in kg (or l) per second (since no fluid data is used, the water density is assumed as 1 kg per l), parameter, needed for design of 2-Mass-Model`
@@ -63,8 +51,3 @@ All input parameters are in SI units. \
 `t_b in °C`
 
 Models can be tested by using the scripts in the Example folder.
-
-
-
-
-
