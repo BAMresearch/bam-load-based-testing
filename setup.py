@@ -22,8 +22,8 @@ INSTALL_REQUIRES = ["numpy",
 SETUP_REQUIRES = INSTALL_REQUIRES.copy()
 
 setuptools.setup(name="bamLoadBasedTesting",
-                 version="0.25.0",
-                 description="Package for load-based-testing with two-mass-model.",
+                 version="1.0.0",
+                 description="Package for load-based-testing with one-mass-model.",
                  long_description=long_description,
                  long_description_content_type="text/markdown",
                  url="https://github.com/BAMresearch/bam-load-based-testing",
