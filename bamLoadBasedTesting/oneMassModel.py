@@ -1,13 +1,14 @@
 """This model is used to calculate the return flow of a building according to the compensation load method
 @author: Stephan Göbel, date: 2025-07"""
 import warnings
+import math
 
 class ThermalMass:
     def __init__(self, mcp, T_start):
         """
         Thermal mass must have initial temperature
-        :param mcp: heat capacity [J/K]
-        :param T_start: initial temperature [°C / K]
+        :param mcp: heat capacity in J/K
+        :param T_start: initial temperature in °C / K
         """
         self.mcp = mcp
         self.T = T_start
@@ -67,16 +68,23 @@ class HydraulicSwitch:
 
 class OneMassBuilding:
     def __init__(self, q_design_plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
-                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
+                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True):
         """
         Init function, use either °C or K but not use both
-        :param ua_hb: thermal conductivity [W/K] between transfer system (H) and Building (B)
-        :param ua_ba: thermal conductivity [W/K] between building and environment
-        :param mcp_h: heat capacity transfer system [J/kg K]
-        :param t_start_h: initial temperature transfer system (H) [°C / K]
-        :param mcp_b: heat capacity building [J/ kg K]
-        :param t_b_design: constant building temperature [°C / K]
-        :param t_a: ambient temperature [°C / K]
+        :param q_design_plc: part-load heating power in W
+        :param ua_hb: thermal conductivity in W/K between transfer system (H) and Building (B)
+        :param mcp_h: heat capacity transfer system in J/kg/K
+        :param t_a: ambient temperature in °C / K
+        :param t_start_h: initial temperature transfer system (H) in °C / K
+        :param t_flow_design: nominal design flow temperature in °C / K
+        :param m_dot_H_design: design mass flow of heating system in kg/s
+        :param T_mean: water mean temperature in condenser in °C / K
+        :param t_b_design: constant building temperature in °C / K
+        :param boostHeat: if true use virtual heater
+        :param maxPowBooHea: maximal power of virtual heater in W
+        :param hydraulicSwitch: if true use hydraulic switch
+        :param relHum: relative humidity
+        :param dynamic_load: True for dynamic load and false for fixed load
         """
         self.q_design_plc = q_design_plc
         self.MassH = ThermalMass(mcp_h, t_start_h)
@@ -95,14 +103,16 @@ class OneMassBuilding:
         self.maxPowBooHea = maxPowBooHea
         self.TagHydSwi = hydraulicSwitch
         self.deltaBH = 0 # virtual booster heater delta T
+        self.dynamic_load = dynamic_load
 
-    def calcHeatFlows(self, m_dot, t_sup, t_ret_mea):
+    def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
         Calculates current heat flows between heat pump -- transfer system; transfer system -- building and
         building -- environment
         :param m_dot: measured value of mass flow [kg/s]
         :param t_sup: measured value of supply temperature [°C]
         :param t_ret_mea: measured value of return temperature [°C]
+        :param heating: true for heating, false for defrost
         """
         if self.boostHeat and t_sup < self.t_flow_design:
             self.q_dot_bh = m_dot*4183*(self.t_flow_design-t_sup)
@@ -120,7 +130,31 @@ class OneMassBuilding:
         if self.TagHydSwi:  # if hydraulic switch is active, use temperature behind switch as input
             self.q_dot_hb = self.ua_hb * ((self.hydraulicSwitch.T_sup_swi + self.MassH.T) / 2 - self.t_b_design)
         else:
-            self.q_dot_hb = self.ua_hb * ((t_sup+self.deltaBH+self.MassH.T)/2 - self.t_b_design)
+            if self.dynamic_load:
+                # Dynamic load approach
+
+                # Previous calculation with arithmetic temperature difference
+                # self.q_dot_hb = self.ua_hb * ((t_sup+self.deltaBH+self.MassH.T)/2 - self.t_b_design)
+
+                # New with logarithmic temperature difference: introduced factor -1 to adjust the direction of the heat
+                # flow rate
+                try:
+                    self.q_dot_hb = (self.ua_hb * (self.MassH.T - (t_sup+self.deltaBH)) * (-1) /
+                                     math.log((self.t_b_design - (t_sup+self.deltaBH)) /
+                                              (self.t_b_design - self.MassH.T)))
+                except:
+                    warnings.warn("WARNING: logarithmic temperature difference failed!")
+                    self.q_dot_hb = self.ua_hb * ((t_sup+self.deltaBH+self.MassH.T)/2 - self.t_b_design)
+
+            else:
+                # Fixed load approach
+
+                if heating:
+                    # no defrost
+                    self.q_dot_hb = self.q_design_plc + 0       # TODO: Check equation!
+                else:
+                    # defrost
+                    self.q_dot_hb = 0
 
     def calc_return(self, t_sup):
         """
@@ -135,7 +169,7 @@ class OneMassBuilding:
             t_ret = self.MassH.T
         return t_ret
 
-    def doStep(self, t_sup, t_ret_mea, m_w_hp, stepSize, q_dot_int = 0):
+    def doStep(self, t_sup, t_ret_mea, m_w_hp, stepSize, heating, q_dot_int = 0):
         """
         step of one second:
         1) calculate current heat flows
@@ -145,12 +179,13 @@ class OneMassBuilding:
         :param m_w_hp: [kg/s]
         :param stepSize [s]
         :param t_ret_mea: measured value of return temperature [°C]
+        :param heating: true for heating, false for defrost
         :param q_dot_int: internal gain heat flow directly into building mass [W]
         """
         self.hydraulicSwitch.calcFlows(m_flow_hp=m_w_hp, T_sup_hp=t_sup+self.deltaBH, T_ret_sh=self.MassH.T)
         self.q_dot_int = q_dot_int
         # calc heat flows depending on current temperatures
-        self.calcHeatFlows(m_dot=m_w_hp, t_sup=t_sup, t_ret_mea=t_ret_mea)
+        self.calcHeatFlows(m_dot=m_w_hp, t_sup=t_sup, t_ret_mea=t_ret_mea, heating=heating)
         # heat flow heat pump & booster heater - heat flow H-->B
         self.MassH.qflow((self.q_dot_hp + self.q_dot_bh - self.q_dot_hb)*stepSize)
         #  calculate new return temperature
@@ -160,50 +195,82 @@ class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
                  tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
         """
-        Calculate paramters for two mass building model according to given parameters of a heat pump.
-        Either a mass flow or a temperature difference on condenser has to be provided.
-        @param t_a_design: design nominal outdoor temperature [°C]
-        @param t_a: outdoor temperature in test point
-        @param q_design: nominal heating power  [W]
-        @param PLC: rel heating load in test point (0...1)
-        @param t_flow_design: nominal design flow temperature [°C]
-        @param t_flow_plc: flow temperature in test point (°C)
-        @param t_b: nominal building temperature (standard value: 20 °C) [°C]
-        @param m_dot_H_design: design mass flow of heating system used if const_flow = True
-        @param delta_T_cond: temperature difference t_flow-t_ret, if no constant mass flow
-        @param const_flow: True/False calculate parameters with given mass flow (True) or given temperature difference (False)
-        @param tau_b: time constant of building in design point (s)
-        @param tau_h: time constant of heating system in design point (s)
+        Calculate parameters for one mass building model according to given parameters of a heat pump.
+
+        :param t_a_design: design nominal outdoor temperature in °C
+        :param t_a: outdoor temperature in test point
+        :param q_design: nominal heating power in W
+        :param PLC: rel heating load in test point (0...1)
+        :param t_flow_design: nominal design flow temperature in °C
+        :param t_flow_plc: flow temperature in test point in °C
+        :param t_b: nominal building temperature (standard value: 20 °C) in °C
+        :param m_dot_H_design: design mass flow of heating system in kg/s
+        :param tau_h: time constant of heating system in design point in s
+        :param boostHeat: if true use virtual heater
+        :param maxPowBooHea: maximal power of virtual heater in W
+        :param hydraulicSwitch: if true use hydraulic switch
+        :param relHum: relative humidity
         """
         self.q_design_plc = q_design*PLC
         self.t_a = t_a
         self.m_dot_H_design = m_dot_H_design
         self.relHum = relHum
-        self.t_a_design=t_a_design
+        self.t_a_design = t_a_design
         self.t_b = t_b
         self.q_design = q_design
         self.PLC = PLC
         self.t_flow_design = t_flow_design
-        self.t_flow_plc =t_flow_plc
+        self.t_flow_plc = t_flow_plc
         self.tau_h = tau_h
         self.hydraulicSwitch = hydraulicSwitch
-        #Mass flow in config configured
-        self.delta_T_cond=self.q_design*self.PLC/(self.m_dot_H_design*4183)
-        delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)
-        self.T_mean = t_flow_plc - 0.5 * self.delta_T_cond
-        self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
-        self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
-        self.t_start_h = self.t_flow_plc - self.delta_T_cond
-        self.mcp_h = self.tau_h * self.ua_hb_design
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
 
-    def createBuilding(self):
+        # Temperature difference in condenser
+        # Mass flow in config configured
+        self.delta_T_cond = self.q_design * self.PLC / (self.m_dot_H_design * 4183)         # PLC
+        delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)                  # Design
+
+        # --- Thermal conductivities ---
+        # 1) Arithmetic:
+        # PLC:
+        # self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
+        # Design:
+        # self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
+
+        # 2) Logarithmic temperature difference:
+        # PLC
+        t_ret = self.t_flow_plc - self.delta_T_cond
+        self.ua_hb = (self.q_design * self.PLC * math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) /
+                      (-1 * (t_ret - self.t_flow_plc)))
+        # Design
+        t_ret_design = self.t_flow_design - delta_T_cond_design
+        self.ua_hb_design = (self.q_design * math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design)) /
+                             (-1 * (t_ret_design - self.t_flow_design)))
+
+        # --- Mean water temperature in condenser ---
+        # 1) Arithmetic:
+        self.T_mean = self.t_flow_plc - 0.5 * self.delta_T_cond                                         # in °C
+        # 2) Logarithmic
+        self.T_mean_log = (self.t_flow_plc - t_ret) / math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) + self.t_b
+
+        # Initial temperature of heating system
+        self.t_start_h = self.t_flow_plc - self.delta_T_cond
+
+        # Thermal capacity of heating system
+        self.mcp_h = self.tau_h * self.ua_hb_design
+
+    def createBuilding(self, dynamic_load=True):
+        """Create one mass building model.
+
+        :param dynamic_load: True for dynamic load and false for fixed load
+        :return one mass building
+        """
         building = OneMassBuilding(q_design_plc = self.q_design_plc, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
-                                   relHum = self.relHum, T_mean = self.T_mean)
+                                   relHum = self.relHum, T_mean = self.T_mean_log, dynamic_load = dynamic_load)
         print(
          "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
