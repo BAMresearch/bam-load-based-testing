@@ -112,7 +112,7 @@ class OneMassBuilding:
         :param m_dot: measured value of mass flow [kg/s]
         :param t_sup: measured value of supply temperature [°C]
         :param t_ret_mea: measured value of return temperature [°C]
-        :param heating: true for heating, false for defrost
+        :param heating: true for heating and cooling, false for defrost
         """
         if self.boostHeat and t_sup < self.t_flow_design:
             self.q_dot_bh = m_dot*4183*(self.t_flow_design-t_sup)
@@ -149,18 +149,17 @@ class OneMassBuilding:
             else:
                 # Fixed load approach
 
-                if heating:
+                if heating:                                     # heating or cooling
                     # no defrost
                     self.q_dot_hb = self.q_design_plc + 0       # TODO: Check equation!
                 else:
                     # defrost
                     self.q_dot_hb = 0
 
-    def calc_return(self, t_sup):
+    def calc_return(self):
         """
         calculates return temperature
         assumption: temperature of heat transfer system is arithmetic mean temperature of supply and return temperature
-        :param t_sup: current supply temperature
         :return: return temperature
         """
         if self.TagHydSwi:
@@ -189,7 +188,7 @@ class OneMassBuilding:
         # heat flow heat pump & booster heater - heat flow H-->B
         self.MassH.qflow((self.q_dot_hp + self.q_dot_bh - self.q_dot_hb)*stepSize)
         #  calculate new return temperature
-        self.t_ret = self.calc_return(t_sup)
+        self.t_ret = self.calc_return()
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
@@ -259,6 +258,39 @@ class CalcParameters:
 
         # Thermal capacity of heating system
         self.mcp_h = self.tau_h * self.ua_hb_design
+
+    def update(self):
+        """Update this class after changing one of the init parameters."""
+        self.__init__(
+            t_a_design=self.t_a_design,
+            t_a=self.t_a,
+            q_design=self.q_design,
+            PLC=self.PLC,
+            t_flow_design=self.t_flow_design,
+            t_flow_plc=self.t_flow_plc,
+            m_dot_H_design=self.m_dot_H_design,
+            tau_h=self.tau_h,
+            t_b=self.t_b,
+            boostHeat=self.boostHeat,
+            maxPowBooHea=self.maxPowBooHea,
+            hydraulicSwitch=self.hydraulicSwitch,
+            relHum=self.relHum,
+        )
+
+    def set_q_design(self, q_design):
+        """Set function for design load."""
+        self.q_design = q_design
+        self.update()
+
+    def set_plc(self, PLC):
+        """Set function for PLC."""
+        self.PLC = PLC
+        self.update()
+
+    def set_t_flow_plc(self, t_flow_plc):
+        """Set function for PLC flow temperature."""
+        self.t_flow_plc = t_flow_plc
+        self.update()
 
     def createBuilding(self, dynamic_load=True):
         """Create one mass building model.
