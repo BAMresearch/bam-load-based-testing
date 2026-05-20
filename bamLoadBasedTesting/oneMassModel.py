@@ -68,7 +68,7 @@ class HydraulicSwitch:
 
 class OneMassBuilding:
     def __init__(self, q_design_plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
-                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True):
+                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True, q_def_corr=0):
         """
         Init function, use either °C or K but not use both
         :param q_design_plc: part-load heating power in W
@@ -85,6 +85,7 @@ class OneMassBuilding:
         :param hydraulicSwitch: if true use hydraulic switch
         :param relHum: relative humidity
         :param dynamic_load: True for dynamic load and false for fixed load
+        :param q_def_corr: defrost correction in W
         """
         self.q_design_plc = q_design_plc
         self.MassH = ThermalMass(mcp_h, t_start_h)
@@ -104,6 +105,7 @@ class OneMassBuilding:
         self.TagHydSwi = hydraulicSwitch
         self.deltaBH = 0 # virtual booster heater delta T
         self.dynamic_load = dynamic_load
+        self.q_def_corr = q_def_corr
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
@@ -151,7 +153,7 @@ class OneMassBuilding:
 
                 if heating:                                     # heating or cooling
                     # no defrost
-                    self.q_dot_hb = self.q_design_plc + 0       # TODO: Check equation!
+                    self.q_dot_hb = self.q_design_plc + self.q_def_corr       # TODO: Check equation!
                 else:
                     # defrost
                     self.q_dot_hb = 0
@@ -192,7 +194,7 @@ class OneMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0):
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0):
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
 
@@ -209,6 +211,7 @@ class CalcParameters:
         :param maxPowBooHea: maximal power of virtual heater in W
         :param hydraulicSwitch: if true use hydraulic switch
         :param relHum: relative humidity
+        :param q_def_corr: defrost correction in W
         """
         self.q_design_plc = q_design*PLC
         self.t_a = t_a
@@ -224,6 +227,7 @@ class CalcParameters:
         self.hydraulicSwitch = hydraulicSwitch
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
+        self.q_def_corr = q_def_corr
 
         # Temperature difference in condenser
         # Mass flow in config configured
@@ -292,6 +296,11 @@ class CalcParameters:
         self.t_flow_plc = t_flow_plc
         self.update()
 
+    def set_q_def_corr(self, q_def_corr):
+        """Set function for defrost correction."""
+        self.q_def_corr = q_def_corr
+        self.update()
+
     def createBuilding(self, dynamic_load=True):
         """Create one mass building model.
 
@@ -302,7 +311,8 @@ class CalcParameters:
                                    t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
-                                   relHum = self.relHum, T_mean = self.T_mean_log, dynamic_load = dynamic_load)
+                                   relHum = self.relHum, T_mean = self.T_mean_log, dynamic_load = dynamic_load,
+                                   q_def_corr = self.q_def_corr)
         print(
          "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
