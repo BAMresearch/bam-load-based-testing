@@ -68,7 +68,7 @@ class HydraulicSwitch:
 
 class OneMassBuilding:
     def __init__(self, q_design_plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
-                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True, q_def_corr=0):
+                 boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True, q_def_corr=0, constant_mflow=True):
         """
         Init function, use either °C or K but not use both
         :param q_design_plc: part-load heating power in W
@@ -86,6 +86,7 @@ class OneMassBuilding:
         :param relHum: relative humidity
         :param dynamic_load: True for dynamic load and false for fixed load
         :param q_def_corr: defrost correction in W
+        :param constant_mflow: if true use constant mass flow
         """
         self.q_design_plc = q_design_plc
         self.MassH = ThermalMass(mcp_h, t_start_h)
@@ -194,7 +195,7 @@ class OneMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0):
+                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0, delta_T_cond=8, constant_mflow=True):
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
 
@@ -212,6 +213,7 @@ class CalcParameters:
         :param hydraulicSwitch: if true use hydraulic switch
         :param relHum: relative humidity
         :param q_def_corr: defrost correction in W
+        :param constant_mflow: if true use constant mass flow
         """
         self.q_design_plc = q_design*PLC
         self.t_a = t_a
@@ -228,11 +230,17 @@ class CalcParameters:
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
         self.q_def_corr = q_def_corr
+        self.constant_mflow = constant_mflow
 
         # Temperature difference in condenser
         # Mass flow in config configured
-        self.delta_T_cond = self.q_design * self.PLC / (self.m_dot_H_design * 4183)         # PLC
-        delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)                  # Design
+        # Difference between variable and fixed flow
+        if constant_mflow:
+            self.delta_T_cond = self.q_design * self.PLC / (self.m_dot_H_design * 4183)         # PLC
+            delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)                  # Design
+        else:
+            self.delta_T_cond = delta_T_cond
+            delta_T_cond_design = delta_T_cond
 
         # --- Thermal conductivities ---
         # 1) Arithmetic:
@@ -279,6 +287,9 @@ class CalcParameters:
             maxPowBooHea=self.maxPowBooHea,
             hydraulicSwitch=self.hydraulicSwitch,
             relHum=self.relHum,
+            q_def_corr=self.q_def_corr,
+            delta_T_cond=self.delta_T_cond,
+            constant_mflow=self.constant_mflow,
         )
 
     def set_q_design(self, q_design):
@@ -301,6 +312,11 @@ class CalcParameters:
         self.q_def_corr = q_def_corr
         self.update()
 
+    def set_constant_mflow(self, constant_mflow):
+        """Set function for constant/variable mass flow."""
+        self.constant_mflow = constant_mflow
+        self.update()
+
     def createBuilding(self, dynamic_load=True):
         """Create one mass building model.
 
@@ -312,7 +328,7 @@ class CalcParameters:
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
                                    relHum = self.relHum, T_mean = self.T_mean_log, dynamic_load = dynamic_load,
-                                   q_def_corr = self.q_def_corr)
+                                   q_def_corr = self.q_def_corr, constant_mflow=self.constant_mflow)
         print(
          "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
