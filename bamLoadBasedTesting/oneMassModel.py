@@ -146,7 +146,7 @@ class OneMassBuilding:
                                      math.log((self.t_b_design - (t_sup+self.deltaBH)) /
                                               (self.t_b_design - self.MassH.T)))
                 except:
-                    warnings.warn("WARNING: logarithmic temperature difference failed!")
+                    warnings.warn("WARNING: logarithmic temperature difference failed in simulation!")
                     self.q_dot_hb = self.ua_hb * ((t_sup+self.deltaBH+self.MassH.T)/2 - self.t_b_design)
 
             else:
@@ -243,28 +243,38 @@ class CalcParameters:
             self.delta_T_cond = delta_T_cond
             delta_T_cond_design = delta_T_cond
 
-        # --- Thermal conductivities ---
+        # --- Thermal conductivities and mean water temperature ---
         # 1) Arithmetic:
         # PLC:
-        # self.ua_hb = self.q_design*self.PLC / (self.t_flow_plc - 0.5*self.delta_T_cond - self.t_b)
+        # self.ua_hb = self.q_design * self.PLC / (self.t_flow_plc - 0.5 * self.delta_T_cond - self.t_b)
         # Design:
-        # self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5*delta_T_cond_design - self.t_b)
+        # self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5 * delta_T_cond_design - self.t_b)
+        # Mean temperature
+        # self.T_mean = self.t_flow_plc - 0.5 * self.delta_T_cond
 
-        # 2) Logarithmic temperature difference:
-        # PLC
-        t_ret = self.t_flow_plc - self.delta_T_cond
-        self.ua_hb = (self.q_design * self.PLC * math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) /
-                      (-1 * (t_ret - self.t_flow_plc)))
-        # Design
-        t_ret_design = self.t_flow_design - delta_T_cond_design
-        self.ua_hb_design = (self.q_design * math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design)) /
-                             (-1 * (t_ret_design - self.t_flow_design)))
+        # 2) Logarithmic temperature difference: if logarithm fails, use arithmetic calculations
+        # Return temperatures
+        t_ret = self.t_flow_plc - self.delta_T_cond                 # PLC
+        t_ret_design = self.t_flow_design - delta_T_cond_design     # Design
+        try:
+            # PLC
+            self.ua_hb = (self.q_design * self.PLC * math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) /
+                          (-1 * (t_ret - self.t_flow_plc)))
+            # Design
+            self.ua_hb_design = (self.q_design * math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design)) /
+                                 (-1 * (t_ret_design - self.t_flow_design)))
+            # Mean temperature
+            self.T_mean_log = (self.t_flow_plc - t_ret) / math.log(
+                (self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) + self.t_b
 
-        # --- Mean water temperature in condenser ---
-        # 1) Arithmetic:
-        self.T_mean = self.t_flow_plc - 0.5 * self.delta_T_cond                                         # in °C
-        # 2) Logarithmic
-        self.T_mean_log = (self.t_flow_plc - t_ret) / math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) + self.t_b
+        except:
+            warnings.warn("WARNING: logarithmic temperature difference failed in initialization!")
+            # conductivity PLC
+            self.ua_hb = self.q_design * self.PLC / (self.t_flow_plc - 0.5 * self.delta_T_cond - self.t_b)
+            # Design
+            self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5 * delta_T_cond_design - self.t_b)
+            # Mean temperature
+            self.T_mean_log = self.t_flow_plc - 0.5 * self.delta_T_cond
 
         # Initial temperature of heating system
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
