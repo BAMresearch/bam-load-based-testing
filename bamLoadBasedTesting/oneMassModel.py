@@ -214,6 +214,7 @@ class CalcParameters:
         :param relHum: relative humidity
         :param q_def_corr: defrost correction in W
         :param constant_mflow: if true use constant mass flow
+        :param delta_T_cond: temperature difference in condenser
         """
         self.q_design_plc = q_design*PLC
         self.t_a = t_a
@@ -312,9 +313,10 @@ class CalcParameters:
         self.q_def_corr = q_def_corr
         self.update()
 
-    def set_constant_mflow(self, constant_mflow):
-        """Set function for constant/variable mass flow."""
+    def set_mass_flow(self, constant_mflow, delta_T_cond):
+        """Set function for constant/variable mass flow and temperature difference."""
         self.constant_mflow = constant_mflow
+        self.delta_T_cond = delta_T_cond
         self.update()
 
     def createBuilding(self, dynamic_load=True):
