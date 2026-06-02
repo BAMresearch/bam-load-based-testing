@@ -67,7 +67,7 @@ class HydraulicSwitch:
 
 
 class OneMassBuilding:
-    def __init__(self, q_design_plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
+    def __init__(self, q_design_plc, plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean, t_b_design=20,
                  boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, dynamic_load=True, q_def_corr=0, constant_mflow=True):
         """
         Init function, use either °C or K but not use both
@@ -89,6 +89,7 @@ class OneMassBuilding:
         :param constant_mflow: if true use constant mass flow
         """
         self.q_design_plc = q_design_plc
+        self.plc = plc
         self.MassH = ThermalMass(mcp_h, t_start_h)
         self.hydraulicSwitch = HydraulicSwitch(m_flow_design=m_dot_H_design, hydraulicSwitch=hydraulicSwitch)
         self.ua_hb = ua_hb
@@ -107,6 +108,7 @@ class OneMassBuilding:
         self.deltaBH = 0 # virtual booster heater delta T
         self.dynamic_load = dynamic_load
         self.q_def_corr = q_def_corr
+        self.constant_mflow = constant_mflow
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
@@ -335,7 +337,7 @@ class CalcParameters:
         :param dynamic_load: True for dynamic load and false for fixed load
         :return one mass building
         """
-        building = OneMassBuilding(q_design_plc = self.q_design_plc, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
+        building = OneMassBuilding(q_design_plc = self.q_design_plc, plc=self.PLC, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
                                    t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc,
                                    boostHeat=self.boostHeat, maxPowBooHea = self.maxPowBooHea,
                                    m_dot_H_design=self.m_dot_H_design, hydraulicSwitch=self.hydraulicSwitch,
