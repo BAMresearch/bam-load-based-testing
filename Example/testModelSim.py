@@ -25,7 +25,7 @@ m_flow_sh = []
 internalGains = 0 # 0 W constant internal gains into building
 #loop by doing x steps
 m_flow = comBui.mass_flow_design
-for x in range(3600*6):
+for x in range(3600*3):
     t.append(x * stepSize)
     "Step response"
     if x<3600*3:
@@ -34,7 +34,7 @@ for x in range(3600*6):
         t_sup.append(Building.t_ret)
     T_ret.append(Building.t_ret)
     "Do step with Building Model"
-    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_w_hp=m_flow, stepSize=stepSize, q_dot_int=internalGains)
+    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_w_hp=m_flow, stepSize=stepSize, q_dot_int=internalGains, heating=True)
     if x==0:
         print("Start value for return temperature " + str(T_ret[-1]) + " °C")
     "Save current values:"

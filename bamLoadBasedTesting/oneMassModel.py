@@ -196,8 +196,9 @@ class OneMassBuilding:
         self.t_ret = self.calc_return()
 
 class CalcParameters:
-    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design,
-                 tau_h=505E3/258, t_b=20, boostHeat = False, maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0, delta_T_cond=8, constant_mflow=True):
+    def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design, constant_mflow,
+                 delta_T_cond_design, dt_mean=0, dt_mean_design=0, tau_h=505E3/258, t_b=20, boostHeat = False,
+                 maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0):
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
 
@@ -216,7 +217,9 @@ class CalcParameters:
         :param relHum: relative humidity
         :param q_def_corr: defrost correction in W
         :param constant_mflow: if true use constant mass flow
-        :param delta_T_cond: temperature difference in condenser
+        :param delta_T_cond_design: design temperature difference in condenser
+        :param dt_mean: logarithmic mean temperature difference
+        :param dt_mean_design: design logarithmic mean temperature difference
         """
         self.q_design_plc = q_design*PLC
         self.t_a = t_a
@@ -240,10 +243,24 @@ class CalcParameters:
         # Difference between variable and fixed flow
         if constant_mflow:
             self.delta_T_cond = self.q_design * self.PLC / (self.m_dot_H_design * 4183)         # PLC
-            delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)                  # Design
+            self.delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)             # Design
+
+            t_ret = self.t_flow_plc - self.delta_T_cond                                         # PLC
+            t_ret_design = self.t_flow_design - self.delta_T_cond_design                        # Design
+
+            self.dt_mean = (self.t_flow_plc - t_ret) / math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret))
+            self.dt_mean_design = (self.t_flow_design - t_ret_design) / math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design))
         else:
-            self.delta_T_cond = delta_T_cond
-            delta_T_cond_design = delta_T_cond
+            self.dt_mean = dt_mean
+            self.dt_mean_design = dt_mean_design
+
+            self.delta_T_cond_design = delta_T_cond_design
+            self.delta_T_cond = delta_T_cond_design * self.PLC
+
+        self.ua_hb = self.q_design * self.PLC / self.dt_mean
+        self.ua_hb_design = self.q_design / self.dt_mean_design
+
+        self.T_mean_log = self.dt_mean + self.t_b
 
         # --- Thermal conductivities and mean water temperature ---
         # 1) Arithmetic:
@@ -256,27 +273,17 @@ class CalcParameters:
 
         # 2) Logarithmic temperature difference: if logarithm fails, use arithmetic calculations
         # Return temperatures
-        t_ret = self.t_flow_plc - self.delta_T_cond                 # PLC
-        t_ret_design = self.t_flow_design - delta_T_cond_design     # Design
-        try:
-            # PLC
-            self.ua_hb = (self.q_design * self.PLC * math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) /
-                          (-1 * (t_ret - self.t_flow_plc)))
-            # Design
-            self.ua_hb_design = (self.q_design * math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design)) /
-                                 (-1 * (t_ret_design - self.t_flow_design)))
-            # Mean temperature
-            self.T_mean_log = (self.t_flow_plc - t_ret) / math.log(
-                (self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) + self.t_b
-
-        except:
-            warnings.warn("WARNING: logarithmic temperature difference failed in initialization!")
-            # conductivity PLC
-            self.ua_hb = self.q_design * self.PLC / (self.t_flow_plc - 0.5 * self.delta_T_cond - self.t_b)
-            # Design
-            self.ua_hb_design = self.q_design / (self.t_flow_design - 0.5 * delta_T_cond_design - self.t_b)
-            # Mean temperature
-            self.T_mean_log = self.t_flow_plc - 0.5 * self.delta_T_cond
+        # t_ret = self.t_flow_plc - self.delta_T_cond                 # PLC
+        # t_ret_design = self.t_flow_design - delta_T_cond_design     # Design
+        # PLC
+        # self.ua_hb = (self.q_design * self.PLC * math.log((self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) /
+        #               (-1 * (t_ret - self.t_flow_plc)))
+        # Design
+        # self.ua_hb_design = (self.q_design * math.log((self.t_b - self.t_flow_design) / (self.t_b - t_ret_design)) /
+        #                      (-1 * (t_ret_design - self.t_flow_design)))
+        # Mean temperature
+        # self.T_mean_log = (self.t_flow_plc - t_ret) / math.log(
+        #     (self.t_b - self.t_flow_plc) / (self.t_b - t_ret)) + self.t_b
 
         # Initial temperature of heating system
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
@@ -301,8 +308,10 @@ class CalcParameters:
             hydraulicSwitch=self.hydraulicSwitch,
             relHum=self.relHum,
             q_def_corr=self.q_def_corr,
-            delta_T_cond=self.delta_T_cond,
+            delta_T_cond_design=self.delta_T_cond_design,
             constant_mflow=self.constant_mflow,
+            dt_mean=self.dt_mean,
+            dt_mean_design=self.dt_mean_design,
         )
 
     def set_q_design(self, q_design):
@@ -346,6 +355,8 @@ class CalcParameters:
         print(
          "Building created:"  +
          " Mass H = " + str(round(building.MassH.mcp,2)) + " ua_hb = " + str(round(building.ua_hb,2)) +
-         " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2))
+         " time constant heating system = " + str(round(building.MassH.mcp / building.ua_hb, 2)) +
+         " ambient temperature = " + str(round(building.t_a, 2)) + " °C"
+         " log mean temperature = " + str(round(building.T_mean, 2)) + " °C"
         )
         return building

@@ -73,6 +73,8 @@ if __name__ == "__main__":
     # Step Size
     stepSize = 1            # in seconds; TODO Align step size with your own step size
 
+    heating_plc = True      # True for heating tests and False for cooling tests
+
     # Create Reduced building
     # TODO Specify all parameters for the test point and the one mass model in
     #  "bamLoadBasedTesting/BuildingModels/OneMassModelConfig.py" or add a new script under
@@ -96,7 +98,15 @@ if __name__ == "__main__":
         t_sup_test_bench = 52       # in °C;    TODO Connect your test bench here!
         m_w_hp = 720/3600           # in kg/s;  TODO Connect your test bench here!
         t_ret_test_bench = 45       # in °C;    TODO Connect your test bench here!
-        heating_test_bench = True   # Boolean value: True if heating (or cooling), False if defrosting TODO Connect your test bench here!
+
+        if heating_plc:
+            if t_sup_test_bench - t_ret_test_bench < 0.2:
+                # heating_test_bench is a boolean value: True if heating (or cooling), False if defrosting
+                heating_test_bench = False      # If you do not want to have zero load during defrosting, just change this variable to "True"
+            else:
+                heating_test_bench = True
+        else:
+            heating_test_bench = True
 
         # Save current state of test bench (tb) and one mass building (bui)
         res_tb.append(

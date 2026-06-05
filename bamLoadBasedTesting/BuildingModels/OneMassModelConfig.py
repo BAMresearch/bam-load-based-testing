@@ -1,3 +1,5 @@
+import math
+
 from bamLoadBasedTesting.oneMassModel import CalcParameters
 
 "Change design power according to your heat pump"
@@ -7,35 +9,45 @@ t_b = 20                    # in °C; see indoor temperature in EN 14825; consta
 t_flow_design = 55          # in °C; design supply temperature
 
 deltaT = 8                  # in K; temperature difference in condenser
-# TODO use mass flow rate from norm test?!
+# TODO use mass flow rate from standard condition (P_rated)?
 mass_flow_design = q_design_e / (4183*deltaT)   # in kg/s; design mass flow of heating system
 
 # Parameters for one mass model
-tau_h = 1957                # in s; time constant of mass
+tau_h = 2384                # in s; time constant of mass, TODO
 use_dynamic_load = True     # if True use dynamic load, if False use fixed load
+use_constant_mflow = True   # if True use constant flow (variable dT), if False use variable flow (constant dT)
+
+# Design logarithmic mean temperature (only for variable flow / fixed delta T)
+t_ret_design = t_flow_design - deltaT
+dt_mean_design = (t_flow_design - t_ret_design) / math.log((t_b - t_flow_design) / (t_b - t_ret_design))
 
 # Design without hydraulic switch and virtual BUH
-ParaMTBui_E = CalcParameters(t_a_design=t_a_design, t_a=-10, q_design=q_design_e, PLC=1, tau_h=tau_h,
+ParaMTBui_E = CalcParameters(t_a_design=t_a_design, t_a=-10, relHum=69.38, q_design=q_design_e, PLC=1, tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=55, t_b=t_b, m_dot_H_design=mass_flow_design,
-                             delta_T_cond=deltaT)
+                             constant_mflow=use_constant_mflow, dt_mean=dt_mean_design, dt_mean_design=dt_mean_design,
+                             delta_T_cond_design=deltaT, q_def_corr=0)
 MTBui_E = ParaMTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
-ParaMTBui_A = CalcParameters(t_a_design=t_a_design, t_a=-7, q_design=q_design_e, PLC=0.885,  tau_h=tau_h,
+ParaMTBui_A = CalcParameters(t_a_design=t_a_design, t_a=-7, relHum=74.69, q_design=q_design_e, PLC=0.8846,  tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=52, t_b=t_b, m_dot_H_design=mass_flow_design,
-                             delta_T_cond=deltaT)
+                             constant_mflow=use_constant_mflow, dt_mean=48.3-t_b, dt_mean_design=dt_mean_design,
+                             delta_T_cond_design=deltaT)
 MTBui_A = ParaMTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
-ParaMTBui_B = CalcParameters(t_a_design=t_a_design, t_a=2, q_design=q_design_e, PLC=0.538, tau_h=tau_h,
+ParaMTBui_B = CalcParameters(t_a_design=t_a_design, t_a=2, relHum=83.87, q_design=q_design_e, PLC=0.5385, tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=42, t_b=t_b, m_dot_H_design=mass_flow_design,
-                             delta_T_cond=deltaT)
+                             constant_mflow=use_constant_mflow, dt_mean=39.8-t_b, dt_mean_design=dt_mean_design,
+                             delta_T_cond_design=deltaT)
 MTBui_B = ParaMTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
-ParaMTBui_C = CalcParameters(t_a_design=t_a_design, t_a=7, q_design=q_design_e, PLC=0.346, tau_h=tau_h,
+ParaMTBui_C = CalcParameters(t_a_design=t_a_design, t_a=7, relHum=86.84, q_design=q_design_e, PLC=0.3462, tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=36, t_b=t_b, m_dot_H_design=mass_flow_design,
-                             delta_T_cond=deltaT)
+                             constant_mflow=use_constant_mflow, dt_mean=34.6-t_b, dt_mean_design=dt_mean_design,
+                             delta_T_cond_design=deltaT)
 MTBui_C = ParaMTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
-ParaMTBui_D = CalcParameters(t_a_design=t_a_design, t_a=12, q_design=q_design_e, PLC=0.154, tau_h=tau_h,
+ParaMTBui_D = CalcParameters(t_a_design=t_a_design, t_a=12, relHum=88.94, q_design=q_design_e, PLC=0.1538, tau_h=tau_h,
                              t_flow_design=t_flow_design, t_flow_plc=30, t_b=t_b, m_dot_H_design=mass_flow_design,
-                             delta_T_cond=deltaT)
+                             constant_mflow=use_constant_mflow, dt_mean=29.4-t_b, dt_mean_design=dt_mean_design,
+                             delta_T_cond_design=deltaT)
 MTBui_D = ParaMTBui_D.createBuilding(dynamic_load=use_dynamic_load)
