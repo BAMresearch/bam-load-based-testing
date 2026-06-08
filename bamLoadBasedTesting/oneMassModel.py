@@ -197,7 +197,7 @@ class OneMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design, constant_mflow,
-                 delta_T_cond_design, dt_mean=0, dt_mean_design=0, tau_h=505E3/258, t_b=20, boostHeat = False,
+                 delta_T_cond_design, c_design, dt_mean=0, dt_mean_design=0, t_b=20, boostHeat = False,
                  maxPowBooHea = 0, hydraulicSwitch = False, relHum = 0, q_def_corr=0):
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
@@ -205,12 +205,12 @@ class CalcParameters:
         :param t_a_design: design nominal outdoor temperature in °C
         :param t_a: outdoor temperature in test point
         :param q_design: nominal heating power in W
+        :param c_design: design thermal capacity in J/K/W_design
         :param PLC: rel heating load in test point (0...1)
         :param t_flow_design: nominal design flow temperature in °C
         :param t_flow_plc: flow temperature in test point in °C
         :param t_b: nominal building temperature (standard value: 20 °C) in °C
         :param m_dot_H_design: design mass flow of heating system in kg/s
-        :param tau_h: time constant of heating system in design point in s
         :param boostHeat: if true use virtual heater
         :param maxPowBooHea: maximal power of virtual heater in W
         :param hydraulicSwitch: if true use hydraulic switch
@@ -231,7 +231,7 @@ class CalcParameters:
         self.PLC = PLC
         self.t_flow_design = t_flow_design
         self.t_flow_plc = t_flow_plc
-        self.tau_h = tau_h
+        self.c_design = c_design
         self.hydraulicSwitch = hydraulicSwitch
         self.boostHeat = boostHeat
         self.maxPowBooHea = maxPowBooHea
@@ -289,7 +289,10 @@ class CalcParameters:
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
 
         # Thermal capacity of heating system
-        self.mcp_h = self.tau_h * self.ua_hb_design
+        # self.mcp_h = self.tau_h * self.ua_hb_design
+        self.mcp_h = self.c_design * self.q_design
+        self.tau_h = self.mcp_h / self.ua_hb
+        # print("tau_h: ", self.tau_h)
 
     def update(self):
         """Update this class after changing one of the init parameters."""
@@ -301,7 +304,7 @@ class CalcParameters:
             t_flow_design=self.t_flow_design,
             t_flow_plc=self.t_flow_plc,
             m_dot_H_design=self.m_dot_H_design,
-            tau_h=self.tau_h,
+            c_design=self.c_design,
             t_b=self.t_b,
             boostHeat=self.boostHeat,
             maxPowBooHea=self.maxPowBooHea,
