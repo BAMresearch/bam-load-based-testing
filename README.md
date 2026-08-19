@@ -84,7 +84,9 @@ More information on how to use the scripts is documented directly in the scripts
 
 1. First, the building models need to be parameterized. 
 This can be done as shown in "BuildingModels/OneMassModelConfig.py".
-The script has several examples for different applications (heating/cooling, medium/low temperature). 
+The script has several examples for different applications (heating/cooling, medium/low temperature).
+You can adjust this script for your use case or simply add new scripts in the directory BuildingModels.
+In the last case, please make sure to adjust the import statements of the building models for the following two scripts.
 2. Parameterized models can be tested by using the script "testModelSim.py" in the "Example" folder. 
 3. Finally, building models can be used for experimental testing on the test bench with the script "Example/modelOnTestBench.py". 
 Further instructions are documented within the script.

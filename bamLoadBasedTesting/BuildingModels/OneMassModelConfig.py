@@ -16,12 +16,12 @@ temperature applications as well as heating and cooling operation.
     - For cooling operation, "_cool" is added at the end. Cooling is only defined for low temperature (LT)
     - For heating operation, there is no additional letter after the part load condition
 """
-# TODO dt_mean and dt_mean_design for cooling
+# TODO dt_mean for cooling
 
 # --- START USER INPUT ---
 # -- Parameters of the heat pump --
 # Heating
-# TODO q_design_e vor all temperature application the same?
+# TODO q_design_e for all temperature application the same?
 q_design_e = 5390           # in W; design heating power in E - only value which is dependent on the heat pump
 t_a_design = -10            # in °C; see T_designh in EN 14825 (average climate)
 mass_flow_design_heat_mt = q_design_e / (4183*8)    # in kg/s; declared mass flow rate from manufacturer
@@ -371,7 +371,7 @@ para_bui_cool_plc_b = CalcParameters(
     m_dot_H_design=mass_flow_design_cool,
     delta_T_cond_design=deltaT_cool,
     t_a=30,
-    # relHum=...,# TODO!
+    # relHum=...,
     t_flow_plc=8.5,
     PLC=-0.7368,
     c_design=c_design_lt,
@@ -389,7 +389,7 @@ para_bui_cool_plc_c = CalcParameters(
     m_dot_H_design=mass_flow_design_cool,
     delta_T_cond_design=deltaT_cool,
     t_a=25,
-    # relHum=...,# TODO!
+    # relHum=...,
     t_flow_plc=10,
     PLC=-0.4737,
     c_design=c_design_lt,
@@ -407,7 +407,7 @@ para_bui_cool_plc_d = CalcParameters(
     m_dot_H_design=mass_flow_design_cool,
     delta_T_cond_design=deltaT_cool,
     t_a=20,
-    # relHum=...,# TODO!
+    # relHum=...,
     t_flow_plc=11.5,
     PLC=-0.2105,
     c_design=c_design_lt,

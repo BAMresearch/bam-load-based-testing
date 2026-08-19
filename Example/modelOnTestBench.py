@@ -113,6 +113,7 @@ if __name__ == "__main__":
         # Save current state of test bench (tb) and one mass building (bui)
         res_tb.append(
             {
+                "time": str(datetime.datetime.now()),
                 "t_sup_test_bench": t_sup_test_bench,
                 "t_ret_test_bench": t_ret_test_bench,
                 "m_w_hp": m_w_hp,
