@@ -101,7 +101,7 @@ class OneMassBuilding:
 
             if heating:                                     # heating or cooling
                 # no defrost
-                self.q_dot_hb = self.q_design_plc + self.q_def_corr       # TODO: Check equation!
+                self.q_dot_hb = self.q_design_plc + self.q_def_corr
             else:
                 # defrost
                 self.q_dot_hb = 0
@@ -273,7 +273,7 @@ class CalcParameters:
             q_design_plc = self.q_design_plc, plc=self.PLC, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
             t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc, m_dot_H_design=self.m_dot_H_design,
             relHum = self.relHum, T_mean = self.T_mean_log, dynamic_load = dynamic_load, q_def_corr = self.q_def_corr,
-            constant_mflow=self.constant_mflow
+            constant_mflow=self.constant_mflow, t_b_design=self.t_b
         )
         print(
          "Building created:"  +
