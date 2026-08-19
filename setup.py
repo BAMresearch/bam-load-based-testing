@@ -15,8 +15,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-INSTALL_REQUIRES = ["numpy",
-                    "matplotlib"
+INSTALL_REQUIRES = ["numpy == 2.4.4",
+                    "matplotlib == 3.10.8",
+                    "pandas == 3.0.3",
+                    "keyboard == 0.13.5",
+                    "openpyxl== 3.1.5",
                     ]
 
 SETUP_REQUIRES = INSTALL_REQUIRES.copy()

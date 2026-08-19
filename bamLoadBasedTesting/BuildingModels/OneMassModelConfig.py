@@ -56,8 +56,8 @@ c_design = c_design_mt
 m_dot_H_design = mass_flow_design_heat_mt
 
 # Design logarithmic mean temperature (only for variable flow / fixed delta T)
-t_ret_design = t_flow_design - deltaT
-dt_mean_design = (t_flow_design - t_ret_design) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_design))
+t_ret_e = t_flow_design - deltaT
+dt_mean_e = (t_flow_design - t_ret_e) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_e))
 
 # Create one mass models for medium temperature application
 ParaMTBui_E = CalcParameters(
@@ -72,8 +72,7 @@ ParaMTBui_E = CalcParameters(
     t_b=t_b_heat,
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
-    dt_mean=dt_mean_design,
-    dt_mean_design=dt_mean_design,
+    dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT
 )
 MTBui_E = ParaMTBui_E.createBuilding(dynamic_load=use_dynamic_load)
@@ -91,7 +90,6 @@ ParaMTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=48.3-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 MTBui_A = ParaMTBui_A.createBuilding(dynamic_load=use_dynamic_load)
@@ -109,7 +107,6 @@ ParaMTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=39.8-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 MTBui_B = ParaMTBui_B.createBuilding(dynamic_load=use_dynamic_load)
@@ -127,7 +124,6 @@ ParaMTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=34.6-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 MTBui_C = ParaMTBui_C.createBuilding(dynamic_load=use_dynamic_load)
@@ -145,7 +141,6 @@ ParaMTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=29.4-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 MTBui_D = ParaMTBui_D.createBuilding(dynamic_load=use_dynamic_load)
@@ -157,8 +152,8 @@ c_design = c_design_lt
 m_dot_H_design = mass_flow_design_heat_lt
 
 # Design logarithmic mean temperature (only for variable flow / fixed delta T)
-t_ret_design = t_flow_design - deltaT
-dt_mean_design = (t_flow_design - t_ret_design) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_design))
+t_ret_e = t_flow_design - deltaT
+dt_mean_e = (t_flow_design - t_ret_e) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_e))
 
 # Create one mass models for low temperature application
 ParaLTBui_E = CalcParameters(
@@ -173,8 +168,7 @@ ParaLTBui_E = CalcParameters(
     t_b=t_b_heat,
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
-    dt_mean=dt_mean_design,             # TODO!
-    dt_mean_design=dt_mean_design,
+    dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT
 )
 LTBui_E = ParaLTBui_E.createBuilding(dynamic_load=use_dynamic_load)
@@ -192,7 +186,6 @@ ParaLTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=31.6-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 LTBui_A = ParaLTBui_A.createBuilding(dynamic_load=use_dynamic_load)
@@ -210,7 +203,6 @@ ParaLTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=28.6-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 LTBui_B = ParaLTBui_B.createBuilding(dynamic_load=use_dynamic_load)
@@ -228,7 +220,6 @@ ParaLTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=26.1-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 LTBui_C = ParaLTBui_C.createBuilding(dynamic_load=use_dynamic_load)
@@ -246,7 +237,6 @@ ParaLTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=23.6-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 LTBui_D = ParaLTBui_D.createBuilding(dynamic_load=use_dynamic_load)
@@ -259,8 +249,8 @@ c_design = c_design_ht
 m_dot_H_design = mass_flow_design_heat_ht
 
 # Design logarithmic mean temperature (only for variable flow / fixed delta T)
-t_ret_design = t_flow_design - deltaT
-dt_mean_design = (t_flow_design - t_ret_design) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_design))
+t_ret_e = t_flow_design - deltaT
+dt_mean_e = (t_flow_design - t_ret_e) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_e))
 
 # Create one mass models for high temperature application
 ParaHTBui_E = CalcParameters(
@@ -275,8 +265,7 @@ ParaHTBui_E = CalcParameters(
     t_b=t_b_heat,
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
-    dt_mean=dt_mean_design,             # TODO!
-    dt_mean_design=dt_mean_design,
+    dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT
 )
 HTBui_E = ParaHTBui_E.createBuilding(dynamic_load=use_dynamic_load)
@@ -294,7 +283,6 @@ ParaHTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=56.4-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 HTBui_A = ParaHTBui_A.createBuilding(dynamic_load=use_dynamic_load)
@@ -312,7 +300,6 @@ ParaHTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=46.2-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 HTBui_B = ParaHTBui_B.createBuilding(dynamic_load=use_dynamic_load)
@@ -330,7 +317,6 @@ ParaHTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=39.2-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 HTBui_C = ParaHTBui_C.createBuilding(dynamic_load=use_dynamic_load)
@@ -348,7 +334,6 @@ ParaHTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=31.2-t_b_heat,
-    dt_mean_design=dt_mean_design,
     delta_T_cond_design=deltaT
 )
 HTBui_D = ParaHTBui_D.createBuilding(dynamic_load=use_dynamic_load)
@@ -360,10 +345,6 @@ t_a_design_cool = 35
 t_flow_design_cool = 7
 deltaT_cool = 5
 
-# TODO check! Logarithmic mean temperature
-t_ret_design = t_flow_design_cool - deltaT_cool
-dt_mean_design = (t_flow_design_cool - t_ret_design) / math.log((t_b_cool - t_flow_design_cool) / (t_b_cool - t_ret_design))
-
 # Cool PLC-A
 para_bui_cool_plc_a = CalcParameters(
     t_a_design=t_a_design_cool,
@@ -372,14 +353,13 @@ para_bui_cool_plc_a = CalcParameters(
     m_dot_H_design=mass_flow_design_cool,
     delta_T_cond_design=deltaT_cool,
     t_a=35,
-    relHum=40.30,# TODO!
+    # relHum=...,
     t_flow_plc=t_flow_design_cool,
     PLC=-1,
     c_design=c_design_lt,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
-    dt_mean_design=dt_mean_design,
 )
 LTBUI_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -398,7 +378,6 @@ para_bui_cool_plc_b = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
-    dt_mean_design=dt_mean_design,
 )
 LTBUI_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -417,7 +396,6 @@ para_bui_cool_plc_c = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
-    dt_mean_design=dt_mean_design,
 )
 LTBUI_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -436,6 +414,5 @@ para_bui_cool_plc_d = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
-    dt_mean_design=dt_mean_design,
 )
 LTBUI_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)

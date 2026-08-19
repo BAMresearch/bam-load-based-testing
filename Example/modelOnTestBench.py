@@ -11,8 +11,9 @@ import warnings
 - Please set your parameters in the main function in the section USER INPUT.
 - After that you can test the script without connecting it to your test bench.
 - To use the script with your test bench, please adjust all the code with the comment 
-  "TODO Connect your test bench here!"
-- Then you can run the script with your test bench
+  "TODO Connect your test bench here!".
+- Please also adjust all the other variables wich contain "TODO" in the comment.
+- Then you can run the script with your test bench.
 - You can save intermediate results by pressing ctrl + s at the same time. The saving process will also be printed in 
   the console. IMPORTANT: Note that this can effect the real-time ability of this script. Saving could take more time
   than the duration of one time step (stepSize)!
@@ -68,17 +69,18 @@ if __name__ == "__main__":
     test_name = "test"      # TODO Insert a name for the test here
 
     # Export path
-    export_path = ""        # TODO Insert an export path here, where the results will be stored
+    export_path = "."       # TODO Insert an export path here, where the results will be stored
 
     # Step Size
     stepSize = 1            # in seconds; TODO Align step size with your own step size
 
-    heating_plc = True      # True for heating tests and False for cooling tests
+    heating_plc = True      # TODO Adjust for your use case: True for heating tests and False for cooling tests
 
     # Create Reduced building
     # TODO Specify all parameters for the test point and the one mass model in
     #  "bamLoadBasedTesting/BuildingModels/OneMassModelConfig.py" or add a new script under
     #  "bamLoadBasedTesting/BuildingModels" with the same parameters with adjusted values.
+    # TODO Specify your building model (here MTBui_A)
     BamBuilding = OneMassModelConfig.MTBui_A
 
     # --- END OF USER INPUT ---
@@ -129,7 +131,8 @@ if __name__ == "__main__":
         )
 
         # Stop measurements and calculations with keyboard
-        if keyboard.is_pressed("ctrl") and keyboard.is_pressed("h") and keyboard.is_pressed("p"):
+        if (keyboard.is_pressed("ctrl") and keyboard.is_pressed("h") and keyboard.is_pressed("p") or
+                (keyboard.is_pressed("ctrl") and keyboard.is_pressed("c"))):
             time_end = datetime.datetime.now()
             print("\nMeasurements and calculations were stopped by keyboard interrupt!\n")
             break
