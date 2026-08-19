@@ -250,7 +250,7 @@ m_dot_H_design = mass_flow_design_heat_ht
 
 # Design logarithmic mean temperature (only for variable flow / fixed delta T)
 t_ret_e = t_flow_design - deltaT
-dt_mean_e = (t_flow_design - dt_mean_e) / math.log((t_b_heat - t_flow_design) / (t_b_heat - dt_mean_e))
+dt_mean_e = (t_flow_design - t_ret_e) / math.log((t_b_heat - t_flow_design) / (t_b_heat - t_ret_e))
 
 # Create one mass models for high temperature application
 ParaHTBui_E = CalcParameters(
