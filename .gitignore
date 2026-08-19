@@ -8,3 +8,5 @@ bamLoadBasedTesting/BuildingModels/__pycache__/
 .eggs/
 
 bamLoadBasedTesting.egg-info/
+
+.vscode/
