@@ -6,14 +6,16 @@ import matplotlib.pyplot as plt
 
 - Please specify the building parametrization you want to test with the variable "Building".
 - Please do not change anything outside of the block "USER INPUT".
-- Your parametrization is correct, if ...
+- Your parametrization is correct, if following conditions are met:
+    - The temperatures are constant over the first three hours (figure 1).
+    - The heat flow rates (q_dot_hb and q_dot_hp) are equal and constant over the first three hours (figure 2).
+    - The Python console does not show any error.
 """
-# TODO add explanations
 # TODO add automatic print if test was successful
 
 # --- START OF USER INPUT ---
 # Create new building model
-comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it here
+comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it (here and also in the first import statement)
 Building = comBui.MTBui_A       # TODO specify building model
 # --- END OF USER INPUT ---
 
@@ -21,20 +23,13 @@ Building = comBui.MTBui_A       # TODO specify building model
 stepSize = 1
 
 # Create lists to save inputs and results
-T_b = []
 T_H = []
 T_ret = []
 q_flow_hp = []
 q_flow_hb = []
-q_flow_ba = []
-q_flow_bh = []
-q_flow_int = []
 t = []
 t_sup = []
-T_sup_hs = []
-m_flow_byp = []
 m_flow_hp = []
-m_flow_sh = []
 
 # Set mass flow rate
 m_flow = Building.m_flow_design
@@ -52,7 +47,10 @@ for x in range(3600*6):
     if x<3600*3:
         t_sup.append(t_flow_design)
     else:
-        t_sup.append(Building.t_ret + 0.1)
+        if Building.plc > 0:
+            t_sup.append(Building.t_ret + 0.1)
+        else:
+            t_sup.append(Building.t_ret - 0.1)
 
     # Save current return temperature from the building model
     T_ret.append(Building.t_ret)
@@ -79,31 +77,31 @@ hours = np.array(t)
 hours = hours/3600
 
 # Plot temperatures (return, transfer system, supply)
-fig, ax = plt.subplots()
-ax.plot(hours, T_ret, label = "return temperature")
-ax.plot(hours, T_H, label = 'transfer system temperature')
-ax.plot(hours, t_sup, label = 'supply temperature heat pump')
+fig1, ax = plt.subplots()
+ax.plot(hours, T_ret, label = "Return temperature")
+ax.plot(hours, T_H, label = 'Transfer system temperature')
+ax.plot(hours, t_sup, label = 'Supply temperature heat pump')
 ax.legend()
 plt.grid(True)
 plt.ylabel('Temperature in °C')
-plt.xlabel('time in hours')
+plt.xlabel('Time in hours')
 plt.show()
 
 # Plot the heat flow rates calculated within the model
-fig1, ax = plt.subplots()
-ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
-ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
+fig2, ax = plt.subplots()
+ax.plot(hours, q_flow_hp, label = 'Heat flow heat pump --> heating system')
+ax.plot(hours, q_flow_hb, label = 'Heat flow transfer --> building')
 ax.legend()
 plt.ylabel('Heat flow in W')
-plt.xlabel('time in hours')
+plt.xlabel('Time in hours')
 plt.grid(True)
 plt.show()
 
 # Plot the mass flow rate of the heat pump
-fig2, ax = plt.subplots()
+fig3, ax = plt.subplots()
 ax.plot(hours, m_flow_hp, label = 'm_flow_hp')
 ax.legend()
-plt.ylabel('mass flow in kg/s')
-plt.xlabel('time in hours')
+plt.ylabel('Mass flow in kg/s')
+plt.xlabel('Time in hours')
 plt.grid(True)
 plt.show()
