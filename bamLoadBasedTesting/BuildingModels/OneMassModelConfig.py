@@ -361,7 +361,7 @@ para_bui_cool_plc_a = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
 )
-LTBUI_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
+LTBui_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 
 # Cool PLC-B
 para_bui_cool_plc_b = CalcParameters(
@@ -379,7 +379,7 @@ para_bui_cool_plc_b = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
 )
-LTBUI_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
+LTBui_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 
 # Cool PLC-C
 para_bui_cool_plc_c = CalcParameters(
@@ -397,7 +397,7 @@ para_bui_cool_plc_c = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
 )
-LTBUI_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
+LTBui_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 
 # Cool PLC-D
 para_bui_cool_plc_d = CalcParameters(
@@ -415,4 +415,4 @@ para_bui_cool_plc_d = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=...,  # TODO!
 )
-LTBUI_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)
+LTBui_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)
