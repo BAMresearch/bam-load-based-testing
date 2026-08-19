@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 "T_h": BamBuilding.MassH.T,
                 "q_dot_hp": BamBuilding.q_dot_hp,
                 "q_dot_hb": BamBuilding.q_dot_hb,
-                "m_dot_H_design": BamBuilding.hydraulicSwitch.m_flow_design,
+                "m_dot_H_design": BamBuilding.m_flow_design,
                 "T_set_supply": BamBuilding.t_flow_design,
                 "T_bui": BamBuilding.t_b_design + 273.15,
             }
