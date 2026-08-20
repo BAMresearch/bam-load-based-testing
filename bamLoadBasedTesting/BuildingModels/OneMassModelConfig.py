@@ -15,6 +15,7 @@ temperature applications as well as heating and cooling operation.
     - The next letter (seventh letter) determines the part load condition (A, B, C, D, E)
     - For cooling operation, "_cool" is added at the end. Cooling is only defined for low temperature (LT)
     - For heating operation, there is no additional letter after the part load condition
+- For the cooling part load conditions, an assumption is used for the parameter dt_mean. Therefore, check the parametrization before you use cooling with variable flow!
 """
 # TODO dt_mean for cooling
 
@@ -345,6 +346,25 @@ t_a_design_cool = 35
 t_flow_design_cool = 7
 deltaT_cool = 5
 
+# TODO assumption!
+if not use_constant_mflow:
+
+    def get_dt_mean(t_sup, plc):
+        t_ret = t_sup + deltaT_cool * plc
+        dt = (t_sup - t_ret) / math.log((t_b_cool - t_sup) / (t_b_cool - t_ret))
+        return dt
+
+    dt_mean_a = get_dt_mean(t_sup=t_flow_design_cool, plc=1)
+    dt_mean_b = get_dt_mean(t_sup=8.5, plc=0.7368)
+    dt_mean_c = get_dt_mean(t_sup=10, plc=0.4737)
+    dt_mean_d = get_dt_mean(t_sup=11.5, plc=0.2105)
+else:
+    # Values not needed for constant mass flow
+    dt_mean_a = ...
+    dt_mean_b = ...
+    dt_mean_c = ...
+    dt_mean_d = ...
+
 # Cool PLC-A
 para_bui_cool_plc_a = CalcParameters(
     t_a_design=t_a_design_cool,
@@ -359,7 +379,7 @@ para_bui_cool_plc_a = CalcParameters(
     c_design=c_design_lt,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
-    dt_mean=...,  # TODO!
+    dt_mean=dt_mean_a,
 )
 LTBui_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -377,7 +397,7 @@ para_bui_cool_plc_b = CalcParameters(
     c_design=c_design_lt,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
-    dt_mean=...,  # TODO!
+    dt_mean=dt_mean_b,
 )
 LTBui_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -395,7 +415,7 @@ para_bui_cool_plc_c = CalcParameters(
     c_design=c_design_lt,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
-    dt_mean=...,  # TODO!
+    dt_mean=dt_mean_c,
 )
 LTBui_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -413,6 +433,6 @@ para_bui_cool_plc_d = CalcParameters(
     c_design=c_design_lt,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
-    dt_mean=...,  # TODO!
+    dt_mean=dt_mean_d,
 )
 LTBui_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)
