@@ -181,6 +181,7 @@ class CalcParameters:
 
             # Recalculate temperature differences in the condenser in K
             self.delta_T_cond = self.q_design * self.PLC / (self.m_dot_H_design * 4183)         # PLC
+            self.delta_T_cond_design = self.q_design / (self.m_dot_H_design * 4183)             # Design
 
             # Calculate return temperature (intermediate step for dt_mean) in °C
             t_ret = self.t_flow_plc - self.delta_T_cond                                         # PLC
