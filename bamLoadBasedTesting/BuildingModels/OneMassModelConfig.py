@@ -45,9 +45,12 @@ t_b_heat = 20               # in °C; see indoor temperature in EN 14825; consta
 t_b_cool = 27               # in °C; building temperature for cooling operation
 
 # Thermal design capacities for different temperature applications
+# Heating:
 c_design_mt = 67            # in J/K/W_design, medium temperature application
 c_design_lt = 418           # in J/K/W_design, low temperature application
 c_design_ht = 109           # in J/K/W_design, high temperature application
+# Cooling:
+c_design_lt_cool = 46       # in J/K/W_design, low temperature application
 
 # --- Examples for heating operation ---
 # -- Medium temperature application --
@@ -376,7 +379,7 @@ para_bui_cool_plc_a = CalcParameters(
     # relHum=...,
     t_flow_plc=t_flow_design_cool,
     PLC=-1,
-    c_design=c_design_lt,
+    c_design=c_design_lt_cool,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_a,
@@ -394,7 +397,7 @@ para_bui_cool_plc_b = CalcParameters(
     # relHum=...,
     t_flow_plc=8.5,
     PLC=-0.7368,
-    c_design=c_design_lt,
+    c_design=c_design_lt_cool,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_b,
@@ -412,7 +415,7 @@ para_bui_cool_plc_c = CalcParameters(
     # relHum=...,
     t_flow_plc=10,
     PLC=-0.4737,
-    c_design=c_design_lt,
+    c_design=c_design_lt_cool,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_c,
@@ -430,7 +433,7 @@ para_bui_cool_plc_d = CalcParameters(
     # relHum=...,
     t_flow_plc=11.5,
     PLC=-0.2105,
-    c_design=c_design_lt,
+    c_design=c_design_lt_cool,
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_d,
