@@ -36,15 +36,16 @@ For the heat flow rate between the heat transfer system and the building ($`\dot
 Depending on the temperatures of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat 
 pump, the heat flow is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the heat transfer system and 
 the building, and a logarithmic temperature difference.
-$`\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}`$
+>> $`\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}`$
 
-3. Fixed load approach: 
+2. Fixed load approach: 
 The heat flow rate $`\dot{Q}_\mathrm{HB}`$ is fixed and corresponds to the design heat flow rate of the part load condition specified for the building model ($`P_\mathrm{designh} \cdot pl(T)`$, see EN 14825).
 There is an option to add a defrost correction $`\dot{Q}_\mathrm{def,corr}`$. During a defrost it is $`\dot{Q}_\mathrm{HB}=0`$.
-$`\dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}`$
+>> $`\dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}`$
 
 
-The associated energy balances of the subsystems determine the temperature changes of the mass H:
+The associated energy balances of the subsystems determine the temperature changes of the mass H. 
+$`C_\mathrm{H}`$ is the thermal capacity of the heat transfer system.
 
 $`\frac{\mathrm{d}\vartheta_\mathrm{H}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HP} - \dot{Q}_\mathrm{HB}}{C_\mathrm{H}}`$
 
