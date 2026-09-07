@@ -6,24 +6,24 @@ import math
 class ThermalMass:
     def __init__(self, mcp, T_start):
         """
-        Thermal mass must have initial temperature
-        :param mcp: heat capacity in J/K
-        :param T_start: initial temperature in °C / K
+        Thermal mass must have initial temperature.
+        :param mcp: heat capacity in J/K.
+        :param T_start: initial temperature in °C / K.
         """
         self.mcp = mcp
         self.T = T_start
 
     def qflow(self, Q):
         """
-        Calculates new temperature after energy input or output
-        :param Q: Energy in Joule, positiv for increasing energy
+        Calculates new temperature after energy input or output.
+        :param Q: Energy in Joule, positiv for increasing energy.
         """
         self.T = self.T + Q/self.mcp
 
     def setT(self, T):
         """
-        Sets temperature off mass directly
-        :param T: new Temperature for mass
+        Sets temperature off mass directly.
+        :param T: new Temperature for mass.
         """
         self.T = T
 
@@ -31,21 +31,25 @@ class OneMassBuilding:
     def __init__(self, q_design_plc, plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean,
                  t_b_design=20, relHum = 0, dynamic_load=True, q_def_corr=0, constant_mflow=True):
         """
-        Init function, use either °C or K but not use both
-        :param q_design_plc: part-load heating power in W
-        :param plc: relative heating load in test point (0...1)
-        :param ua_hb: thermal conductivity in W/K between transfer system (H) and Building (B)
-        :param mcp_h: heat capacity transfer system in J/K
-        :param t_a: ambient temperature in °C / K
-        :param t_start_h: initial temperature transfer system (H) in °C / K
-        :param t_flow_design: nominal design flow temperature in °C / K
-        :param m_dot_H_design: design mass flow of heating system in kg/s
-        :param T_mean: water mean temperature in condenser in °C / K
-        :param t_b_design: constant building temperature in °C / K
-        :param relHum: relative humidity in %
-        :param dynamic_load: True for dynamic load and false for fixed load
-        :param q_def_corr: defrost correction in W
-        :param constant_mflow: if true use constant mass flow
+        Init function, use either °C or K but not use both.
+        :param q_design_plc: part-load heating power in W.
+        :param plc: relative heating load in test point (0...1).
+        :param ua_hb: thermal conductivity in W/K between transfer system (H) and Building (B).
+        :param mcp_h: heat capacity transfer system in J/K.
+        :param t_a: ambient temperature in °C / K.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param t_start_h: initial temperature transfer system (H) in °C / K.
+        :param t_flow_design: nominal design flow temperature in °C / K.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param m_dot_H_design: design mass flow of heating system in kg/s.
+        :param T_mean: water mean temperature in condenser in °C / K.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param t_b_design: constant building temperature in °C / K.
+        :param relHum: relative humidity in %.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param dynamic_load: True for dynamic load and false for fixed load.
+        :param q_def_corr: defrost correction in W.
+        :param constant_mflow: if true use constant mass flow.
         """
         # Initialize given values
         self.q_design_plc = q_design_plc
@@ -71,11 +75,11 @@ class OneMassBuilding:
 
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
-        Calculates current heat flows between heat pump -- transfer system (q_dot_hp) and transfer system -- building (q_dot_hb)
-        :param m_dot: measured value of mass flow [kg/s]
-        :param t_sup: measured value of supply temperature [°C]
-        :param t_ret_mea: measured value of return temperature [°C]
-        :param heating: true for heating and cooling, false for defrost
+        Calculates current heat flows between heat pump -- transfer system (q_dot_hp) and transfer system -- building (q_dot_hb).
+        :param m_dot: measured value of mass flow [kg/s].
+        :param t_sup: measured value of supply temperature [°C].
+        :param t_ret_mea: measured value of return temperature [°C].
+        :param heating: true for heating and cooling, false for defrost.
         """
 
         # Heat flow rate from the heat pump to the heat transfer system
@@ -135,23 +139,27 @@ class CalcParameters:
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
 
-        :param t_a_design: design nominal outdoor temperature in °C
-        :param t_a: outdoor temperature in test point in °C
-        :param q_design: nominal heating power in W
-        :param PLC: relative heating load in test point (0...1)
-        :param t_flow_design: nominal design flow temperature in °C
-        (e.g. 55 °C for medium temperature or 35 °C for low temperature)
+        :param t_a_design: design nominal outdoor temperature in °C.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param t_a: outdoor temperature in test point in °C.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param q_design: nominal heating power in W.
+        :param PLC: relative heating load in test point (0...1).
+        :param t_flow_design: nominal design flow temperature in °C.
+        (e.g. 55 °C for medium temperature or 35 °C for low temperature).
+        This parameter has currently no impact on the calculations and is just listed for completeness.
         :param t_flow_plc: flow temperature of test point in °C
-        (e.g. 52 °C for PLC-A at medium temperature application)
-        :param m_dot_H_design: design mass flow of heating system in kg/s
-        :param constant_mflow: if true use constant mass flow
-        :param delta_T_cond_design: design temperature difference in condenser (for heating) in K
-        :param c_design: design thermal capacity in J/K/W_design
+        (e.g. 52 °C for PLC-A at medium temperature application).
+        :param m_dot_H_design: design mass flow of heating system in kg/s.
+        :param constant_mflow: if true use constant mass flow.
+        :param delta_T_cond_design: design temperature difference in condenser (for heating) in K.
+        :param c_design: design thermal capacity in J/K/W_design.
         :param dt_mean: logarithmic mean temperature difference in K
-        (for the specific part load e.g. PLC-A)
-        :param t_b: nominal building temperature (standard value: 20 °C) in °C
-        :param relHum: relative humidity in %
-        :param q_def_corr: defrost correction in W
+        (for the specific part load e.g. PLC-A).
+        :param t_b: nominal building temperature (standard value: 20 °C) in °C.
+        :param relHum: relative humidity in %.
+        This parameter has currently no impact on the calculations and is just listed for completeness.
+        :param q_def_corr: defrost correction in W.
         """
 
         # Initialize given values
@@ -267,8 +275,8 @@ class CalcParameters:
     def createBuilding(self, dynamic_load=True):
         """Create one mass building model.
 
-        :param dynamic_load: True for dynamic load and false for fixed load
-        :return one mass building
+        :param dynamic_load: True for dynamic load and false for fixed load.
+        :return one mass building.
         """
         building = OneMassBuilding(
             q_design_plc = self.q_design_plc, plc=self.PLC, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
