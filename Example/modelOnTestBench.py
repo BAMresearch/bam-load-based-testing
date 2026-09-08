@@ -21,6 +21,8 @@ import warnings
   saved.
 - If the above keyboard shortcuts do not seem to work, hold all keys for one or two seconds.
 - This script shows an example on how to save the results. This could also be done differently.
+- The column "Comments" in the result file shows logged comments from the one mass model (e.g. if the logarithmic mean
+  temperature difference was not defined)
 """
 
 
@@ -144,6 +146,7 @@ if __name__ == "__main__":
                     "m_dot_H_design": BamBuilding.m_flow_design,
                     "T_set_supply": BamBuilding.t_flow_design,
                     "T_bui": BamBuilding.t_b_design,
+                    "Comments": BamBuilding.comment_log
                 }
             )
 

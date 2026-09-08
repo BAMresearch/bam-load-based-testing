@@ -78,6 +78,9 @@ class OneMassBuilding:
         self.water_sup = Fluid(FluidsList.Water).factory()
         self.water_ret = Fluid(FluidsList.Water).factory()
 
+        # Variable to log comments (stays empty if there are no comments to log)
+        self.comment_log = []
+
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
         Calculates current heat flows between heat pump -- transfer system (q_dot_hp) and transfer system -- building (q_dot_hb).
@@ -107,6 +110,9 @@ class OneMassBuilding:
 
         except:
             warnings.warn("WARNING: enthalpies could not be determined!")
+            self.comment_log.append(
+                "WARNING: enthalpies could not be determined, so constant heating capacity was assumed!"
+            )
 
             # If enthalpy cannot be determined (e.g. T < Tmelt), use the temperature difference with constant cp=4183 J/kg/K
             self.q_dot_hp = m_dot * 4183 * (t_sup - t_ret_mea)
@@ -122,7 +128,10 @@ class OneMassBuilding:
                                  math.log((self.t_b_design - t_sup) /
                                           (self.t_b_design - self.MassH.T)))
             except:
-                warnings.warn("WARNING: logarithmic temperature difference failed in simulation!")
+                warnings.warn("WARNING: logarithmic temperature difference was not defined!")
+                self.comment_log.append(
+                    "WARNING: logarithmic temperature difference was not defined, so arithmetic temperature difference was used!"
+                )
 
                 # Previous calculation with arithmetic temperature difference used as backup
                 self.q_dot_hb = self.ua_hb * ((t_sup+self.MassH.T)/2 - self.t_b_design)
@@ -141,6 +150,7 @@ class OneMassBuilding:
         """
         Calculate the new return temperature for the heat pump.
         Step of 'stepSize' (e.g. 1 second):
+        0) Reset the comment log for the next step.
         1) Calculate current heat flows.
         2) Calculate new temperature of thermal masses based on energy balance.
         3) Get return temperature (= temperature of thermal mass).
@@ -150,6 +160,9 @@ class OneMassBuilding:
         :param stepSize: step size of the building model (also sampling frequency of the test bench) [s].
         :param heating: true for heating, false for defrost.
         """
+
+        # Reset logged comments for the next step
+        self.comment_log = []
 
         # Calculate heat flows depending on current temperatures
         self.calcHeatFlows(m_dot=m_w_hp, t_sup=t_sup, t_ret_mea=t_ret_mea, heating=heating)
