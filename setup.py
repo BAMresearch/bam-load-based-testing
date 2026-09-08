@@ -19,7 +19,9 @@ INSTALL_REQUIRES = ["numpy == 2.4.4",
                     "matplotlib == 3.10.8",
                     "pandas == 3.0.3",
                     "keyboard == 0.13.5",
-                    "openpyxl== 3.1.5",
+                    "openpyxl == 3.1.5",
+                    "CoolProp == 8.0.0",
+                    "pyfluids == 4.0.0",
                     ]
 
 SETUP_REQUIRES = INSTALL_REQUIRES.copy()

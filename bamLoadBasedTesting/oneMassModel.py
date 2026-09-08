@@ -2,6 +2,7 @@
 @author: Stephan Göbel, date: 2025-07"""
 import warnings
 import math
+from pyfluids import Fluid, FluidsList, Input
 
 class ThermalMass:
     def __init__(self, mcp, T_start):
@@ -73,6 +74,10 @@ class OneMassBuilding:
         self.q_dot_hp = 0       # in W, heat flow rate from heat pump to heating system
         self.q_dot_hb = 0       # in W, heat flow rate from heating system to building
 
+        # Create fluid instances for water (supply and return conditions)
+        self.water_sup = Fluid(FluidsList.Water).factory()
+        self.water_ret = Fluid(FluidsList.Water).factory()
+
     def calcHeatFlows(self, m_dot, t_sup, t_ret_mea, heating):
         """
         Calculates current heat flows between heat pump -- transfer system (q_dot_hp) and transfer system -- building (q_dot_hb).
@@ -82,8 +87,30 @@ class OneMassBuilding:
         :param heating: true for heating and cooling, false for defrost.
         """
 
-        # Heat flow rate from the heat pump to the heat transfer system
-        self.q_dot_hp = m_dot*4183*(t_sup-t_ret_mea)
+        # Calculate heat flow rate from the heat pump to the heat transfer system
+        try:
+            # Try to calculate this based on enthalpy differences determined with water data
+
+            # Assumption for the water pressure
+            p_water = 3e5
+
+            # Get enthalpy for supplied water
+            self.water_sup.update(Input.temperature(t_sup), Input.pressure(p_water))
+            h_sup = self.water_sup.enthalpy                                             # in J/kg
+
+            # Get enthalpy for returned water
+            self.water_ret.update(Input.temperature(t_ret_mea), Input.pressure(p_water))
+            h_ret = self.water_ret.enthalpy                                             # in J/kg
+
+            # Heat flow rate from the heat pump to the heat transfer system
+            self.q_dot_hp = m_dot * (h_sup - h_ret)                                     # in W
+
+        except:
+            warnings.warn("WARNING: enthalpies could not be determined!")
+
+            # If enthalpy cannot be determined (e.g. T < Tmelt), use the temperature difference with constant cp=4183 J/kg/K
+            self.q_dot_hp = m_dot * 4183 * (t_sup - t_ret_mea)
+
 
         # Heat flow rate from the heat transfer system to the building
         if self.dynamic_load:
