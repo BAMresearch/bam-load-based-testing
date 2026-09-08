@@ -17,7 +17,6 @@ temperature applications as well as heating and cooling operation.
     - For heating operation, there is no additional letter after the part load condition
 - For the cooling part load conditions, an assumption is used for the parameter dt_mean. Therefore, check the parametrization before you use cooling with variable flow!
 """
-# TODO dt_mean for cooling
 
 # --- START USER INPUT ---
 # -- Parameters of the heat pump --
@@ -355,7 +354,6 @@ t_a_design_cool = 35
 t_flow_design_cool = 7
 deltaT_cool = 5
 
-# TODO assumption!
 if not use_constant_mflow:
 
     def get_dt_mean(t_sup, plc):
