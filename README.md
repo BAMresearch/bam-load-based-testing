@@ -14,7 +14,7 @@ Installation steps are:
 `git clone https://github.com/BAMresearch/bam-load-based-testing/`
 2. Install the package via pip. Use conda prompt console or the terminal within pycharm:
 `pip install -e <local path to git repo>`
-3. If you do not need the package anymore you can deinstall it via git:
+3. If you do not need the package anymore you can deinstall it via pip:
 `pip uninstall bamLoadBasedTesting`
 
 ## One-mass model
@@ -132,3 +132,11 @@ In the last case, please make sure to adjust the import statements of the buildi
 2. Parameterized models can be tested by using the script "testModelSim.py" in the "Example" folder. 
 3. Finally, building models can be used for experimental testing on the test bench with the script "Example/modelOnTestBench.py". 
 Further instructions are documented within the script.
+
+
+## References
+[1] https://coolprop.org/  
+[2] Bell, I. H., Wronski, J., Quoilin, S. & Lemort, V. (2014). Pure and Pseudo-pure Fluid Thermophysical Property 
+    Evaluation and the Open-Source Thermophysical Property Library CoolProp. 
+    *Industrial & Engineering Chemistry Research* *53*(6), 2498-2508.
+    https://doi.org/10.1021/ie4033999  
