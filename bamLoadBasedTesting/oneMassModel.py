@@ -32,9 +32,9 @@ class OneMassBuilding:
     def __init__(self, q_design_plc, plc, ua_hb, mcp_h,  t_a, t_start_h, t_flow_design, m_dot_H_design, T_mean,
                  t_b_design=20, relHum = 0, dynamic_load=True, q_def_corr=0, constant_mflow=True):
         """
-        Init function, use either °C or K but not use both.
+        Init function, use either °C or K but do not use both.
         :param q_design_plc: part-load heating power in W.
-        :param plc: relative heating load in test point (0...1).
+        :param plc: part load ratio in test point (0...1).
         :param ua_hb: thermal conductivity in W/K between transfer system (H) and Building (B).
         :param mcp_h: heat capacity transfer system in J/K.
         :param t_a: ambient temperature in °C / K.
@@ -184,7 +184,7 @@ class CalcParameters:
         :param t_a: outdoor temperature in test point in °C.
         This parameter has currently no impact on the calculations and is just listed for completeness.
         :param q_design: nominal heating power in W.
-        :param PLC: relative heating load in test point (0...1).
+        :param PLC: part load ratio in test point (0...1).
         :param t_flow_design: nominal design flow temperature in °C.
         (e.g. 55 °C for medium temperature or 35 °C for low temperature).
         This parameter has currently no impact on the calculations and is just listed for completeness.
