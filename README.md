@@ -123,7 +123,7 @@ Please find a short description below. For further information please look at th
 The building model is defined in the class "OneMassBuilding" in "oneMassModel.py" and consists of one object of the 
 class "ThermalMass" (mass with capacity and temperature) that represents the heat transfer system.
 The "OneMassBuilding" has two functions:
-1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1a/1b) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1B or 2.2).
+1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1a/1b) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1b or 2.2).
 2. "doStep()": This function is used to first uses "calcHeatFlows()" and then to calculate the above mentioned energy balance (equation 3) to calculate the new return temperature of the heat pump.
 
 #### The class CalcParameters
