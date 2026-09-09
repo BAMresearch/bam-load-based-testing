@@ -99,20 +99,20 @@ This model can be used for heat pumps with fixed and variable water mass flow ra
 
 ## Implementation in python
 
-### The script oneMassBuilding()
+### The script oneMassModel.py
 This script contains the main classes for the calculation of the above mentioned equations. 
-Please find a short description below. For further information please look at the documentation in the script
+Please find a short description below. For further information please look at the documentation in the script.
 #### The class OneMassBuilding
 The building model is defined in the class "OneMassBuilding" in "oneMassModel.py" and consists of one object of the 
 class "ThermalMass" (mass with capacity and temperature) that represents the heat transfer system.
 The "OneMassBuilding" has two functions:
-1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HB}`$ and $`\dot{Q}_\mathrm{HP}`$.
-2. "doStep()": This function is used to first uses "calcHeatFlows()" and then calculates the above mentioned energy balance to calculate the new return temperature of the heat pump.
+1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1a/1b) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1B or 2.2).
+2. "doStep()": This function is used to first uses "calcHeatFlows()" and then to calculate the above mentioned energy balance (equation 3) to calculate the new return temperature of the heat pump.
 
 #### The class CalcParameters
-To configure a new building model, the class "CalcParameters" can be used (also in defined in "oneMassModel.py"). 
+To configure a new building model, the class "CalcParameters" can be used (also defined in "oneMassModel.py"). 
 A building model can be configured for a heat pump with constant mass flow or a constant temperature difference 
-(t_flow - t_ret; variable flow). In both cases, the nominal heating power and the nominal flow temperature of the heat 
+(variable flow). In both cases, the nominal heating power and the nominal flow temperature of the heat 
 pump must be specified. Additionally, the thermal design capacity of the mass as well as the ambient temperature are required.
 Also conditions for the specific part load (e.g. PLC-A) have to be specified.
 The calculations in this class mainly happen in two functions:
