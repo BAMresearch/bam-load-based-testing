@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
     - The heat flow rates (q_dot_hb and q_dot_hp) are equal and constant over the first three hours (figure 2).
     - The Python console does not show any error.
 """
-# TODO add automatic print if test was successful
 
 # --- START OF USER INPUT ---
 # Create new building model
