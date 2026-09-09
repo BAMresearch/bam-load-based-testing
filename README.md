@@ -51,7 +51,8 @@ $$
 Furthermore, mass H (heat transfer system) is connected to a building with a constant temperature of 
 $`\vartheta_\mathrm{B}=20 \mathrm{°C}`$ for heating or $`\vartheta_\mathrm{B}=27 \mathrm{°C}`$ for cooling. 
 For the heat flow rate between the heat transfer system and the building ($`\dot{Q}_\mathrm{HB}`$), there are two approaches.
-1. Dynamic load approach: 
+
+**Dynamic load approach**: 
 Depending on the temperature of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat 
 pump, the heat flow rate $`\dot{Q}_\mathrm{HB}`$ is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the heat transfer system and 
 the building, and a logarithmic temperature difference.
@@ -70,7 +71,7 @@ $$
 \end{equation}
 $$
 
-2. Fixed load approach: 
+**Fixed load approach**: 
 The heat flow rate $`\dot{Q}_\mathrm{HB}`$ is fixed and corresponds to the design heat flow rate of the part load condition specified for the building model ($`P_\mathrm{designh} \cdot pl(T)`$, see EN 14825).
 There is an option to add a defrost correction $`\dot{Q}_\mathrm{def,corr}`$. During a defrost it is $`\dot{Q}_\mathrm{HB}=0`$.
 $$
