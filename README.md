@@ -25,36 +25,77 @@ The mass is characterized by a heat capacity MCp and an initial temperature $`\v
 The heat output provided by the heat pump $`\dot{Q}_\mathrm{HP}`$ is delivered to mass H. $`\dot{Q}_\mathrm{HP}`$ is 
 calculated based on the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat pump, the measured return
 temperature of the heat pump $`\vartheta_\mathrm{ret,mea}`$ and the mass flow rate through the heat transfer system
-$`\dot{m}_\mathrm{w}`$.
+$`\dot{m}_\mathrm{w}`$. Based on $`\vartheta_\mathrm{S}`$ and $`\vartheta_\mathrm{ret,mea}`$ the enthalpies 
+$`h_\mathrm{S}`$ and $`h_\mathrm{ret,mea}`$ are determined using CoolProp [1, 2] and assuming an absolute pressure of 
+3e5 Pa at the heat pump supply and return.
 
-$`\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot 4183~\mathrm{J/kg/K} \cdot (\vartheta_\mathrm{S} - \vartheta_\mathrm{ret,mea})`$
+$$
+\begin{equation} 
+\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot (h_\mathrm{S} - h_\mathrm{ret,mea})\label{eq1}
+\tag{1a}
+\end{equation}
+$$
+
+As a fall-back solution the following equation is implemented with a constant specific heat capacity. This equation 
+would only be used, if the above equation was not calculated (e.g. enthalpies were not defined). In this case a comment
+will be logged.
+
+$$
+\begin{equation} 
+\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot 4183~\mathrm{J/kg/K} \cdot (\vartheta_\mathrm{S} - 
+\vartheta_\mathrm{ret,mea})
+\tag{1b}
+\end{equation}
+$$
 
 Furthermore, mass H (heat transfer system) is connected to a building with a constant temperature of 
 $`\vartheta_\mathrm{B}=20 \mathrm{°C}`$ for heating or $`\vartheta_\mathrm{B}=27 \mathrm{°C}`$ for cooling. 
 For the heat flow rate between the heat transfer system and the building ($`\dot{Q}_\mathrm{HB}`$), there are two approaches.
 1. Dynamic load approach: 
-Depending on the temperatures of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat 
-pump, the heat flow is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the heat transfer system and 
+Depending on the temperature of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat 
+pump, the heat flow rate $`\dot{Q}_\mathrm{HB}`$ is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the heat transfer system and 
 the building, and a logarithmic temperature difference.
->> $`\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}`$
+$$
+\begin{equation} 
+\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}
+\tag{2.1a}
+\end{equation}
+$$
+If the logarithmic temperature difference cannot be calculated (due to mathematical reasons), an arithmetic temperature
+difference will be used with following equation. In this case a comment will be logged, too.
+$$
+\begin{equation} 
+\dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \cdot (\frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{2} - \vartheta_\mathrm{B})
+\tag{2.1b}
+\end{equation}
+$$
 
 2. Fixed load approach: 
 The heat flow rate $`\dot{Q}_\mathrm{HB}`$ is fixed and corresponds to the design heat flow rate of the part load condition specified for the building model ($`P_\mathrm{designh} \cdot pl(T)`$, see EN 14825).
 There is an option to add a defrost correction $`\dot{Q}_\mathrm{def,corr}`$. During a defrost it is $`\dot{Q}_\mathrm{HB}=0`$.
->> $`\dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}`$
-
+$$
+\begin{equation} 
+\dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}
+\tag{2.2}
+\end{equation}
+$$
 
 The associated energy balances of the subsystems determine the temperature changes of the mass H. 
 $`C_\mathrm{H}`$ is the thermal capacity of the heat transfer system.
 
-$`\frac{\mathrm{d}\vartheta_\mathrm{H}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HP} - \dot{Q}_\mathrm{HB}}{C_\mathrm{H}}`$
+$$
+\begin{equation} 
+\frac{\mathrm{d}\vartheta_\mathrm{H}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HP} - \dot{Q}_\mathrm{HB}}{C_\mathrm{H}}
+\tag{3}
+\end{equation}
+$$
 
-With this Equation the temperature of the heating system $`\vartheta_\mathrm{H}`$ can be recalculated.
+With this equation the temperature of the heating system $`\vartheta_\mathrm{H}`$ can be recalculated.
 This temperature is then used as the new return temperature $`\vartheta_\mathrm{ret,calc}`$ for the heat pump.
 
 $`\vartheta_\mathrm{ret,calc} = \vartheta_\mathrm{H}`$
 
-This model can be used for heat pumps with fixed and variable (water) mass flow rate in the heat transfer system.
+This model can be used for heat pumps with fixed and variable water mass flow rate in the heat transfer system.
 
 ## Implementation in python
 
