@@ -10,12 +10,13 @@ temperature applications as well as heating and cooling operation.
 - The examples are for variable outlet temperature. If you want to test fixed outlet temperature please adjust t_flow_plc for each part load condition.
 - The examples are for heat pumps using outdoor air at the outer heat exchanger. If you want to test with exhaust air please adjust t_a and relHum.
 - Naming convention:
-    - The first two letters determine the temperature application (LT, MT, HT)
+    - The first two letters determine the temperature application (LT, MT, HT: low, medium, high temperature)
     - Then it directly follows "Bui_" (for building)
     - The next letter (seventh letter) determines the part load condition (A, B, C, D, E)
-    - For cooling operation, "_cool" is added at the end. Cooling is only defined for low temperature (LT)
+    - For cooling operation, "_cool" is added at the end. Cooling examples here are only for low temperature (LT)
     - For heating operation, there is no additional letter after the part load condition
 - For the cooling part load conditions, an assumption is used for the parameter dt_mean. Therefore, check the parametrization before you use cooling with variable flow!
+- Assumptions were also used for PLC-E (heating operation) regarding dt_mean and t_flow_plc.
 """
 
 # --- START USER INPUT ---
@@ -23,16 +24,16 @@ temperature applications as well as heating and cooling operation.
 # Heating
 
 # Design heating power in E
-q_design_e_lt = 5390        # in W
-q_design_e_mt = 5390        # in W
-q_design_e_ht = 5390        # in W
+q_design_e_lt = 5390        # in W, for low temperature application
+q_design_e_mt = 5390        # in W, for medium temperature application
+q_design_e_ht = 5390        # in W, for high temperature application
 
 t_a_design = -10            # in °C; see T_designh in EN 14825 (average climate)
 
 # Declared mass flow rate from manufacturer
-mass_flow_design_heat_lt = q_design_e_lt / (4183*5)     # in kg/s; declared mass flow rate from manufacturer
-mass_flow_design_heat_mt = q_design_e_mt / (4183*8)     # in kg/s; declared mass flow rate from manufacturer
-mass_flow_design_heat_ht = q_design_e_ht / (4183*10)    # in kg/s; declared mass flow rate from manufacturer
+mass_flow_design_heat_lt = q_design_e_lt / (4183*5)     # in kg/s; for low temperature application
+mass_flow_design_heat_mt = q_design_e_mt / (4183*8)     # in kg/s; for medium temperature application
+mass_flow_design_heat_ht = q_design_e_ht / (4183*10)    # in kg/s; for high temperature application
 
 # Cooling
 p_design_c = 5000                                       # in W; design cooling power
