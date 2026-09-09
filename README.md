@@ -32,6 +32,7 @@ $`h_\mathrm{S}`$ and $`h_\mathrm{ret,mea}`$ are determined using CoolProp [1, 2]
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot (h_\mathrm{S} - h_\mathrm{ret,mea})
+\qquad(\text{equation 1a})
 \tag{1a}
 \end{equation}
 $$
@@ -44,6 +45,7 @@ $$
 \begin{equation} 
 \dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot 4183~\mathrm{J/kg/K} \cdot (\vartheta_\mathrm{S} - 
 \vartheta_\mathrm{ret,mea})
+\qquad(\text{equation 1b})
 \tag{1b}
 \end{equation}
 $$
@@ -60,6 +62,7 @@ the building, and a logarithmic temperature difference.
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}
+\qquad(\text{equation 2.1a})
 \tag{2.1a}
 \end{equation}
 $$
@@ -70,6 +73,7 @@ difference will be used with following equation. In this case a comment will be 
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \cdot (\frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{2} - \vartheta_\mathrm{B})
+\qquad(\text{equation 2.1b})
 \tag{2.1b}
 \end{equation}
 $$
@@ -81,6 +85,7 @@ There is an option to add a defrost correction $`\dot{Q}_\mathrm{def,corr}`$. Du
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}
+\qquad(\text{equation 2.2})
 \tag{2.2}
 \end{equation}
 $$
@@ -91,6 +96,7 @@ $`C_\mathrm{H}`$ is the thermal capacity of the heat transfer system.
 $$
 \begin{equation} 
 \frac{\mathrm{d}\vartheta_\mathrm{H}}{\mathrm{d}t} = \frac{\dot{Q}_\mathrm{HP} - \dot{Q}_\mathrm{HB}}{C_\mathrm{H}}
+\qquad(\text{equation 3})
 \tag{3}
 \end{equation}
 $$
@@ -98,7 +104,13 @@ $$
 With this equation the temperature of the heating system $`\vartheta_\mathrm{H}`$ can be recalculated.
 This temperature is then used as the new return temperature $`\vartheta_\mathrm{ret,calc}`$ for the heat pump.
 
-$`\vartheta_\mathrm{ret,calc} = \vartheta_\mathrm{H}`$
+$$
+\begin{equation} 
+\vartheta_\mathrm{ret,calc} = \vartheta_\mathrm{H}
+\qquad(\text{equation 4})
+\tag{4}
+\end{equation}
+$$
 
 This model can be used for heat pumps with fixed and variable water mass flow rate in the heat transfer system.
 
