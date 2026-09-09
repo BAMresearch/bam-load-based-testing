@@ -22,7 +22,7 @@ import warnings
 - If the above keyboard shortcuts do not seem to work, hold all keys for one or two seconds.
 - This script shows an example on how to save the results. This could also be done differently.
 - The column "Comments" in the result file shows logged comments from the one mass model (e.g. if the logarithmic mean
-  temperature difference was not defined)
+  temperature difference was not defined).
 """
 
 
@@ -89,7 +89,9 @@ if __name__ == "__main__":
     # Create Reduced building
     # TODO Specify all parameters for the test point and the one mass model in
     #  "bamLoadBasedTesting/BuildingModels/OneMassModelConfig.py" or add a new script under
-    #  "bamLoadBasedTesting/BuildingModels" with the same parameters with adjusted values.
+    #  "bamLoadBasedTesting/BuildingModels" with the same parameters with adjusted values (in this case the import
+    #  statement of this script [from bamLoadBasedTesting.BuildingModels import OneMassModelConfig] has to be adjusted
+    #  to the new script!).
     # TODO Specify your building model (here MTBui_A)
     BamBuilding = OneMassModelConfig.MTBui_A
 
