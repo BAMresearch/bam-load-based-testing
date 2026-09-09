@@ -31,7 +31,7 @@ $`h_\mathrm{S}`$ and $`h_\mathrm{ret,mea}`$ are determined using CoolProp [1, 2]
 
 $$
 \begin{equation} 
-\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot (h_\mathrm{S} - h_\mathrm{ret,mea})\label{eq1}
+\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot (h_\mathrm{S} - h_\mathrm{ret,mea})
 \tag{1a}
 \end{equation}
 $$
