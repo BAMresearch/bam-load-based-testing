@@ -56,14 +56,17 @@ For the heat flow rate between the heat transfer system and the building ($`\dot
 Depending on the temperature of the mass H and the supply temperature $`\vartheta_\mathrm{S}`$ provided by the heat 
 pump, the heat flow rate $`\dot{Q}_\mathrm{HB}`$ is determined by the thermal conductivity $`UA_\mathrm{HB}`$ between the heat transfer system and 
 the building, and a logarithmic temperature difference.
+
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{\ln(\frac{\vartheta_\mathrm{B} - \vartheta_\mathrm{S}}{\vartheta_\mathrm{B} - \vartheta_\mathrm{H}})}
 \tag{2.1a}
 \end{equation}
 $$
+
 If the logarithmic temperature difference cannot be calculated (due to mathematical reasons), an arithmetic temperature
 difference will be used with following equation. In this case a comment will be logged, too.
+
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} =  UA_\mathrm{HB} \cdot (\frac{\vartheta_\mathrm{S} - \vartheta_\mathrm{H}}{2} - \vartheta_\mathrm{B})
@@ -74,6 +77,7 @@ $$
 **Fixed load approach**: 
 The heat flow rate $`\dot{Q}_\mathrm{HB}`$ is fixed and corresponds to the design heat flow rate of the part load condition specified for the building model ($`P_\mathrm{designh} \cdot pl(T)`$, see EN 14825).
 There is an option to add a defrost correction $`\dot{Q}_\mathrm{def,corr}`$. During a defrost it is $`\dot{Q}_\mathrm{HB}=0`$.
+
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HB} = P_\mathrm{designh} \cdot pl(T) + \dot{Q}_\mathrm{def,corr}
