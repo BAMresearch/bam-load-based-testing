@@ -71,6 +71,10 @@ for x in range(3600*6):
     q_flow_hp.append(Building.q_dot_hp)
     m_flow_hp.append(m_flow)
 
+    if Building.t_ret < 1:
+        # Abort if return temperature is too low
+        break
+
 # Adjust time to hours for plots
 hours = np.array(t)
 hours = hours/3600
