@@ -1,82 +1,110 @@
-"""Script to test 1-mass-building model"""
-
 from bamLoadBasedTesting.BuildingModels import OneMassModelConfig
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Create new building model:
-comBui = OneMassModelConfig
-Building = comBui.MTBui_A
+"""Script to test the parametrization of a one-mass-building model.
+
+- Please specify the building parametrization you want to test with the variable "Building".
+- Please do not change anything outside of the block "USER INPUT".
+- Your parametrization is correct, if following conditions are met:
+    - The temperatures are constant over the first three hours (figure 1).
+    - The heat flow rates (q_dot_hb and q_dot_hp) are equal and constant over the first three hours (figure 2).
+    - The Python console does not show any error.
+"""
+
+# --- START OF USER INPUT ---
+# Create new building model
+comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it (here and also in the first import statement)
+Building = comBui.MTBui_A       # TODO specify building model
+# --- END OF USER INPUT ---
+
+# Set step size of the model
 stepSize = 1
-T_b = []
+
+# Create lists to save inputs and results
 T_H = []
 T_ret = []
 q_flow_hp = []
 q_flow_hb = []
-q_flow_ba = []
-q_flow_bh = []
-q_flow_int = []
 t = []
 t_sup = []
-T_sup_hs = []
-m_flow_byp = []
 m_flow_hp = []
-m_flow_sh = []
-internalGains = 0 # 0 W constant internal gains into building
-#loop by doing x steps
-m_flow = comBui.mass_flow_design
+
+# Set mass flow rate
+m_flow = Building.m_flow_design
+
+# Get design supply temperature of building model
+t_flow_design = Building.t_flow_design
+
+# Loop by doing x steps (simulation over 6 hours)
 for x in range(3600*6):
+    # Save current time
     t.append(x * stepSize)
-    "Step response"
+
+    # Step response: after 3 hours with constant supply temperature, the heat pump is turned off by setting the supply
+    # temperature equal to the current calculated return temperature
     if x<3600*3:
-        t_sup.append(52)
+        t_sup.append(t_flow_design)
     else:
-        t_sup.append(Building.t_ret)
+        if Building.plc > 0:
+            t_sup.append(Building.t_ret + 0.1)
+        else:
+            t_sup.append(Building.t_ret - 0.1)
+
+    # Save current return temperature from the building model
     T_ret.append(Building.t_ret)
-    "Do step with Building Model"
-    Building.doStep(t_sup=t_sup[-1], t_ret_mea=T_ret[-1], m_w_hp=m_flow, stepSize=stepSize, q_dot_int=internalGains)
+
+    # Do a step with the building model
+    Building.doStep(
+        t_sup=t_sup[-1],
+        t_ret_mea=T_ret[-1],
+        m_w_hp=m_flow,
+        stepSize=stepSize,
+        heating=True
+    )
     if x==0:
         print("Start value for return temperature " + str(T_ret[-1]) + " °C")
-    "Save current values:"
+
+    # Save current values
     T_H.append(Building.MassH.T)
-    T_sup_hs.append(Building.hydraulicSwitch.T_sup_swi)
     q_flow_hb.append(Building.q_dot_hb)
     q_flow_hp.append(Building.q_dot_hp)
-    q_flow_int.append(Building.q_dot_int)
-    q_flow_bh.append(Building.q_dot_bh)
-    m_flow_byp.append(Building.hydraulicSwitch.m_flow_swi)
     m_flow_hp.append(m_flow)
-    m_flow_sh.append(Building.hydraulicSwitch.m_flow_sh)
 
+    if Building.t_ret < 1:
+        # Abort if return temperature is too low
+        break
+
+# Adjust time to hours for plots
 hours = np.array(t)
 hours = hours/3600
-fig, ax = plt.subplots()
-ax.plot(hours, T_ret, label = "return temperature")
-ax.plot(hours, T_H, label = 'transfer system temperature')
-ax.plot(hours, t_sup, label = 'supply temperature heat pump')
-ax.plot(hours, T_sup_hs, label = 'supply temperature transfer system')
+
+# Plot temperatures (return, transfer system, supply)
+fig1, ax = plt.subplots()
+ax.plot(hours, T_ret, label = "Return temperature")
+ax.plot(hours, T_H, label = 'Transfer system temperature')
+ax.plot(hours, t_sup, label = 'Supply temperature heat pump')
 ax.legend()
 plt.grid(True)
 plt.ylabel('Temperature in °C')
-plt.xlabel('time in hours')
+plt.xlabel('Time in hours')
 plt.show()
 
-fig, ax = plt.subplots()
-ax.plot(hours, q_flow_hp, label = 'heat flow heat pump --> heating system ')
-ax.plot(hours, q_flow_hb, label = 'heat flow transfer --> building')
-#ax.plot(hours, q_flow_bh, label = 'heat flow booster heater --> heating system')
+# Plot the heat flow rates calculated within the model
+fig2, ax = plt.subplots()
+ax.plot(hours, q_flow_hp, label = 'Heat flow heat pump --> heating system')
+ax.plot(hours, q_flow_hb, label = 'Heat flow transfer --> building')
 ax.legend()
 plt.ylabel('Heat flow in W')
-plt.xlabel('time in hours')
+plt.xlabel('Time in hours')
 plt.grid(True)
 plt.show()
 
-fig, ax = plt.subplots()
-ax.plot(hours, m_flow_byp, label = 'm_flow_bypass')
-ax.plot(hours, m_flow_sh, label = 'm_flow_sh')
+# Plot the mass flow rate of the heat pump
+fig3, ax = plt.subplots()
 ax.plot(hours, m_flow_hp, label = 'm_flow_hp')
 ax.legend()
-plt.ylabel('mass flow in kg/s')
-plt.xlabel('time in hours')
+plt.ylabel('Mass flow in kg/s')
+plt.xlabel('Time in hours')
 plt.grid(True)
 plt.show()
