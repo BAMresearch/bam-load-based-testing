@@ -109,14 +109,7 @@ class OneMassBuilding:
             self.q_dot_hp = m_dot * (h_sup - h_ret)                                     # in W
 
         except:
-            warnings.warn("WARNING: enthalpies could not be determined!")
-            self.comment_log.append(
-                "WARNING: enthalpies could not be determined, so constant heating capacity was assumed!"
-            )
-
-            # If enthalpy cannot be determined (e.g. T < Tmelt), use the temperature difference with constant cp=4183 J/kg/K
-            self.q_dot_hp = m_dot * 4183 * (t_sup - t_ret_mea)
-
+            raise ValueError("WARNING: enthalpies could not be determined! Return temperature might be too low!")
 
         # Heat flow rate from the heat transfer system to the building
         if self.dynamic_load:
