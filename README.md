@@ -152,4 +152,5 @@ Further instructions are documented within the script.
 [3] Portyanikhin, V. (2026). pyfluids 4.0.0 CoolProp wrapper for Python, https://pypi.org/project/pyfluids/  
 [4] Bell, I. H. & CoolProp Team (no year given). IF97 Steam/Water Properties. https://coolprop.org/fluid_properties/IF97.html  
 [5] International Association for the Properties of Water and Steam, IAPWS R6-95 (2018), *Revised Release on the IAPWS 
-    Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance for General and Scientific Use* (2018)
+    Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance for General and Scientific Use* 
+    (2018), https://iapws.org/technical-guidance/release/IAPWS-95
