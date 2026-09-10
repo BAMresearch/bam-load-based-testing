@@ -32,21 +32,8 @@ $`h_\mathrm{S}`$ and $`h_\mathrm{ret,mea}`$ are determined using CoolProp [1, 2]
 $$
 \begin{equation} 
 \dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot (h_\mathrm{S} - h_\mathrm{ret,mea})
-\qquad(\text{equation 1a})
-\tag{1a}
-\end{equation}
-$$
-
-As a fall-back solution the following equation is implemented with a constant specific heat capacity. This equation 
-would only be used, if the above equation was not calculated (e.g. enthalpies were not defined). In this case a comment
-will be logged.
-
-$$
-\begin{equation} 
-\dot{Q}_\mathrm{HP} = \dot{m}_\mathrm{w} \cdot 4183~\mathrm{J/kg/K} \cdot (\vartheta_\mathrm{S} - 
-\vartheta_\mathrm{ret,mea})
-\qquad(\text{equation 1b})
-\tag{1b}
+\qquad(\text{equation 1})
+\tag{1}
 \end{equation}
 $$
 
@@ -123,7 +110,7 @@ Please find a short description below. For further information please look at th
 The building model is defined in the class "OneMassBuilding" in "oneMassModel.py" and consists of one object of the 
 class "ThermalMass" (mass with capacity and temperature) that represents the heat transfer system.
 The "OneMassBuilding" has two functions:
-1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1a/1b) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1b or 2.2).
+1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1b or 2.2).
 2. "doStep()": This function is used to first uses "calcHeatFlows()" and then to calculate the above mentioned energy balance (equation 3) to calculate the new return temperature of the heat pump.
 
 #### The class CalcParameters
