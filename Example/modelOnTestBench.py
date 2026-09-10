@@ -122,7 +122,7 @@ if __name__ == "__main__":
             t_ret_test_bench = 45       # in °C;    TODO Connect your test bench here!
 
             if heating_plc:
-                if t_sup_test_bench - t_ret_test_bench < 0.2:
+                if t_ret_test_bench - t_sup_test_bench < 0.2:
                     # heating_test_bench is a boolean value: True if heating (or cooling), False if defrosting
                     heating_test_bench = False      # If you do not want to have zero load during defrosting, just change this variable to "True"
                 else:
