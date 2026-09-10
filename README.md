@@ -110,8 +110,13 @@ Please find a short description below. For further information please look at th
 The building model is defined in the class "OneMassBuilding" in "oneMassModel.py" and consists of one object of the 
 class "ThermalMass" (mass with capacity and temperature) that represents the heat transfer system.
 The "OneMassBuilding" has two functions:
-1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates $`\dot{Q}_\mathrm{HP}`$ (equation 1) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1b or 2.2).
-2. "doStep()": This function is used to first uses "calcHeatFlows()" and then to calculate the above mentioned energy balance (equation 3) to calculate the new return temperature of the heat pump.
+1. "calcHeatFlows()": This function is used to calculate the above mentioned heat flow rates 
+$`\dot{Q}_\mathrm{HP}`$ (equation 1) and $`\dot{Q}_\mathrm{HB}`$ (equation 2.1a/2.1b or 2.2).
+The water enthalpies at supply and return conditions for $`\dot{Q}_\mathrm{HP}`$ (equation 1) are determined using
+the fluid "Water" from CoolProp [1,2] via the wrapper pyfluids 4.0.0 [3]. According to [4] the fluid "Water" refers to 
+the thermodynamic properties of the Helmholtz formulation (IAPWS-95 [5]).
+2. "doStep()": This function is used to first apply "calcHeatFlows()" and then to calculate the above mentioned energy 
+balance (equation 3) to calculate the new return temperature of the heat pump.
 
 #### The class CalcParameters
 To configure a new building model, the class "CalcParameters" can be used (also defined in "oneMassModel.py"). 
@@ -139,8 +144,12 @@ Further instructions are documented within the script.
 
 
 ## References
-[1] https://coolprop.org/  
+[1] Bell, I. H. & CoolProp Team (no year given). Welcome to CoolProp. https://coolprop.org/  
 [2] Bell, I. H., Wronski, J., Quoilin, S. & Lemort, V. (2014). Pure and Pseudo-pure Fluid Thermophysical Property 
     Evaluation and the Open-Source Thermophysical Property Library CoolProp. 
     *Industrial & Engineering Chemistry Research* *53*(6), 2498-2508.
     https://doi.org/10.1021/ie4033999  
+[3] Portyanikhin, V. (2026). pyfluids 4.0.0 CoolProp wrapper for Python, https://pypi.org/project/pyfluids/  
+[4] Bell, I. H. & CoolProp Team (no year given). IF97 Steam/Water Properties. https://coolprop.org/fluid_properties/IF97.html  
+[5] International Association for the Properties of Water and Steam, IAPWS R6-95 (2018), *Revised Release on the IAPWS 
+    Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance for General and Scientific Use* (2018)
