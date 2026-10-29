@@ -5,7 +5,7 @@ from bamLoadBasedTesting.oneMassModel import CalcParameters
 """This script shows some examples on how to parameterize the building models for different part load conditions, 
 temperature applications as well as heating and cooling operation.
 
-- Please adjust the parameters in the section "USER INPUT". The mass flow rates are only default values that should be exchanged!
+- Please adjust the parameters in the section "USER INPUT".
 - This script shows examples for an average climate. If you want to test other climates please adjust the plc parameter accordingly.
 - The examples are for variable outlet temperature. If you want to test fixed outlet temperature please adjust t_flow_plc for each part load condition.
 - The examples are for heat pumps using outdoor air at the outer heat exchanger. If you want to test with exhaust air please adjust t_a and relHum.
@@ -30,22 +30,24 @@ q_design_e_ht = 5390        # in W, for high temperature application
 
 t_a_design = -10            # in °C; see T_designh in EN 14825 (average climate)
 
-# Declared mass flow rate from manufacturer
+# Mass flow rates for heating
 mass_flow_design_heat_lt = q_design_e_lt / (4183*5)     # in kg/s; for low temperature application
 mass_flow_design_heat_mt = q_design_e_mt / (4183*8)     # in kg/s; for medium temperature application
 mass_flow_design_heat_ht = q_design_e_ht / (4183*10)    # in kg/s; for high temperature application
 
 # Cooling
 p_design_c = 5000                                       # in W; design cooling power
-mass_flow_design_cool = p_design_c / (4183*5)           # in kg/s; declared mass flow rate from manufacturer
+mass_flow_design_cool = p_design_c / (4183*5)           # in kg/s; mass flow rate for cooling
 
 # -- Settings of the one mass model --
-use_dynamic_load = True     # if True use dynamic load, if False use fixed load
 use_constant_mflow = True   # if True use constant flow (variable dT), if False use variable flow (constant dT)
 
 # --- END USER INPUT ---
 
 # --- Parameters for one mass model (depending on operation (heating/cooling) and temperature application) ---
+# Load
+use_dynamic_load = True     # if True use dynamic load, if False use fixed load
+
 # Building temperatures
 t_b_heat = 20               # in °C; see indoor temperature in EN 14825; constant building temperature (heating operation)
 t_b_cool = 27               # in °C; building temperature for cooling operation
