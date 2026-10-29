@@ -311,6 +311,13 @@ class CalcParameters:
         :param dynamic_load: True for dynamic load and false for fixed load.
         :return one mass building.
         """
+
+        if not dynamic_load:
+            warnings.warn("Your model is parameterized for FIXED LOAD. Are you sure that this is correct?")
+            key_input = input("Put in 'y' and confirm with enter to continue with this parametrization or put in any other character to abort the script.\n")
+            if not key_input == "y":
+                raise UserWarning("The script was aborted. Check your model parametrization and try again.")
+
         building = OneMassBuilding(
             q_design_plc = self.q_design_plc, plc=self.PLC, ua_hb=self.ua_hb, mcp_h=self.mcp_h, t_a=self.t_a,
             t_start_h=self.t_start_h, t_flow_design=self.t_flow_plc, m_dot_H_design=self.m_dot_H_design,
