@@ -168,7 +168,7 @@ class OneMassBuilding:
 
 class CalcParameters:
     def __init__(self, t_a_design, t_a, q_design, PLC, t_flow_design, t_flow_plc, m_dot_H_design, constant_mflow,
-                 delta_T_cond_design, c_design, dt_mean=0, t_b=20, relHum = 0, q_def_corr=0):
+                 delta_T_cond_design, c_design, dt_mean=0, t_b=20, relHum = 0, q_def_corr=0, m_w_virtual=0):
         """
         Calculate parameters for one mass building model according to given parameters of a heat pump.
 
@@ -193,6 +193,8 @@ class CalcParameters:
         :param relHum: relative humidity in %.
         This parameter has currently no impact on the calculations and is just listed for completeness.
         :param q_def_corr: defrost correction in W.
+        :param m_w_virtual: additional virtual mass of water necessary to fulfill the minimum mass of water required by
+        the installation manual in kg.
         """
 
         # Initialize given values
@@ -210,6 +212,7 @@ class CalcParameters:
         self.t_b = t_b
         self.relHum = relHum
         self.q_def_corr = q_def_corr
+        self.m_w_virtual = m_w_virtual
 
         # Calculate heat capacity for the given test point in W
         self.q_design_plc = q_design * PLC
@@ -255,7 +258,7 @@ class CalcParameters:
         self.t_start_h = self.t_flow_plc - self.delta_T_cond
 
         # Thermal capacity of heating system in J/K
-        self.mcp_h = self.c_design * self.q_design
+        self.mcp_h = self.c_design * self.q_design + self.m_w_virtual * 4183
 
         # Time constant of heating system in s
         self.tau_h = self.mcp_h / self.ua_hb

@@ -42,6 +42,11 @@ mass_flow_design_cool = p_design_c / (4183*5)           # in kg/s; mass flow rat
 # -- Settings of the one mass model --
 use_constant_mflow = True   # if True use constant flow (variable dT), if False use variable flow (constant dT)
 
+# The parameter "m_w_virtual" is the additional virtual mass of water necessary to fulfill the minimum mass of water
+# required by the installation manual in kg. If you need to adjust this parameter you can do this directly for each
+# model for a specific test point below in the corresponding class initiation of "CalcParameters" by adjusting
+# "m_w_virtual = 0" (last parameter of the initiation). By default, "m_w_virtual" is set to 0 kg.
+
 # --- END USER INPUT ---
 
 # --- Parameters for one mass model (depending on operation (heating/cooling) and temperature application) ---
@@ -85,7 +90,8 @@ ParaMTBui_E = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 MTBui_E = ParaMTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -102,7 +108,8 @@ ParaMTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=48.3-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 MTBui_A = ParaMTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -119,7 +126,8 @@ ParaMTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=39.8-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 MTBui_B = ParaMTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -136,7 +144,8 @@ ParaMTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=34.6-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 MTBui_C = ParaMTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -153,7 +162,8 @@ ParaMTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=29.4-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 MTBui_D = ParaMTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -181,7 +191,8 @@ ParaLTBui_E = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 LTBui_E = ParaLTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -198,7 +209,8 @@ ParaLTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=31.6-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 LTBui_A = ParaLTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -215,7 +227,8 @@ ParaLTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=28.6-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 LTBui_B = ParaLTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -232,7 +245,8 @@ ParaLTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=26.1-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 LTBui_C = ParaLTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -249,7 +263,8 @@ ParaLTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=23.6-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 LTBui_D = ParaLTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -278,7 +293,8 @@ ParaHTBui_E = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 HTBui_E = ParaHTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -295,7 +311,8 @@ ParaHTBui_A = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=56.4-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 HTBui_A = ParaHTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -312,7 +329,8 @@ ParaHTBui_B = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=46.2-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 HTBui_B = ParaHTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -329,7 +347,8 @@ ParaHTBui_C = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=39.2-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 HTBui_C = ParaHTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -346,7 +365,8 @@ ParaHTBui_D = CalcParameters(
     m_dot_H_design=m_dot_H_design,
     constant_mflow=use_constant_mflow,
     dt_mean=31.2-t_b_heat,
-    delta_T_cond_design=deltaT
+    delta_T_cond_design=deltaT,
+    m_w_virtual = 0,
 )
 HTBui_D = ParaHTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -390,6 +410,7 @@ para_bui_cool_plc_a = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_a,
+    m_w_virtual = 0,
 )
 LTBui_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -408,6 +429,7 @@ para_bui_cool_plc_b = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_b,
+    m_w_virtual = 0,
 )
 LTBui_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -426,6 +448,7 @@ para_bui_cool_plc_c = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_c,
+    m_w_virtual = 0,
 )
 LTBui_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -444,5 +467,6 @@ para_bui_cool_plc_d = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_d,
+    m_w_virtual = 0,
 )
 LTBui_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)
