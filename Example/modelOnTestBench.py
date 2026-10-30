@@ -19,7 +19,7 @@ import warnings
   than the duration of one time step (stepSize)!
 - You can stop the calculations by pressing ctrl + h + p at the same time. After that all results and settings will be 
   saved.
-- If the above keyboard shortcuts do not seem to work, hold all keys for one or two seconds.
+- If the above keyboard shortcuts do not seem to work, hold the keys for some seconds.
 - This script shows an example on how to save the results. This could also be done differently.
 - The column "Comments" in the result file shows logged comments from the one mass model (e.g. if the logarithmic mean
   temperature difference was not defined).
@@ -117,14 +117,14 @@ if __name__ == "__main__":
             t1 = time.time()
 
             # Get current measurements from test bench
-            t_sup_test_bench = 52       # in °C;    TODO Connect your test bench here!
-            m_w_hp = 720/3600           # in kg/s;  TODO Connect your test bench here!
-            t_ret_test_bench = 45       # in °C;    TODO Connect your test bench here!
+            t_sup_test_bench = 52       # in °C, supply temperature;    TODO Connect your test bench here!
+            m_w_hp = 720/3600           # in kg/s, mass flow rate;      TODO Connect your test bench here!
+            t_ret_test_bench = 45       # in °C, return temperature;    TODO Connect your test bench here!
 
             if heating_plc:
                 if t_ret_test_bench - t_sup_test_bench < 0.2:
                     # heating_test_bench is a boolean value: True if heating (or cooling), False if defrosting
-                    heating_test_bench = False      # If you do not want to have zero load during defrosting, just change this variable to "True"
+                    heating_test_bench = False      # If you do not want to have zero load during defrosting (in case of a fixed load test), just change this variable to "True"
                 else:
                     heating_test_bench = True
             else:

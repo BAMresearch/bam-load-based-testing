@@ -5,7 +5,7 @@ from bamLoadBasedTesting.oneMassModel import CalcParameters
 """This script shows some examples on how to parameterize the building models for different part load conditions, 
 temperature applications as well as heating and cooling operation.
 
-- Please adjust the parameters in the section "USER INPUT".
+- Please adjust the parameters in the section "USER INPUT" if necessary.
 - This script shows examples for an average climate. If you want to test other climates please adjust the plc parameter accordingly.
 - The examples are for variable outlet temperature (except cooling at high temperature application). 
   If you want to test fixed outlet temperature please adjust t_flow_plc for each part load condition.

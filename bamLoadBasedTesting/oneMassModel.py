@@ -1,4 +1,4 @@
-"""This model is used to calculate the return flow of a building according to the compensation load method
+"""This model is used to calculate the return flow of a building model for load based testing
 @author: Stephan Göbel, date: 2025-07"""
 import warnings
 import math
