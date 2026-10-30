@@ -7,15 +7,17 @@ import matplotlib.pyplot as plt
 - Please specify the building parametrization you want to test with the variable "Building".
 - Please do not change anything outside of the block "USER INPUT".
 - Your parametrization is correct, if following conditions are met:
-    - The temperatures are constant over the first three hours (figure 1).
-    - The heat flow rates (q_dot_hb and q_dot_hp) are equal and constant over the first three hours (figure 2).
+    - The temperatures are constant over the first three hours (first figure).
+    - The temperature difference between supply and return temperature is equal to the standard temperature difference 
+      multiplied with the part load ratio (in the first three hours, first figure)
+    - The heat flow rates (q_dot_hb and q_dot_hp) are equal and constant over the first three hours (second figure).
     - The Python console does not show any error.
 """
 
 # --- START OF USER INPUT ---
 # Create new building model
 comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it (here and also in the first import statement)
-Building = comBui.MTBui_A       # TODO specify building model
+Building = comBui.MTBui_E       # TODO specify building model
 # --- END OF USER INPUT ---
 
 # Set step size of the model
