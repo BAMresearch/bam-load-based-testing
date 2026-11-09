@@ -12,14 +12,14 @@ import warnings
 - After that you can test the script without connecting it to your test bench.
 - To use the script with your test bench, please adjust all the code with the comment 
   "TODO Connect your test bench here!".
-- Please also adjust all the other variables wich contain "TODO" in the comment.
+- Please also adjust all the other variables which contain "TODO" in the comment.
 - Then you can run the script with your test bench.
 - You can save intermediate results by pressing ctrl + s at the same time. The saving process will also be printed in 
   the console. IMPORTANT: Note that this can effect the real-time ability of this script. Saving could take more time
   than the duration of one time step (stepSize)!
 - You can stop the calculations by pressing ctrl + h + p at the same time. After that all results and settings will be 
   saved.
-- If the above keyboard shortcuts do not seem to work, hold the keys for some seconds.
+- If the above keyboard shortcuts do not seem to work, hold the keys for some seconds (duration of stepSize).
 - This script shows an example on how to save the results. This could also be done differently.
 - The column "Comments" in the result file shows logged comments from the one mass model (e.g. if the logarithmic mean
   temperature difference was not defined).

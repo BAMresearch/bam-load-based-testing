@@ -1,4 +1,3 @@
-from bamLoadBasedTesting.BuildingModels import OneMassModelConfig
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,7 +15,8 @@ import matplotlib.pyplot as plt
 
 # --- START OF USER INPUT ---
 # Create new building model
-comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it (here and also in the first import statement)
+from bamLoadBasedTesting.BuildingModels import OneMassModelConfig
+comBui = OneMassModelConfig     # If you saved your model parametrization in another file you can adjust it (here and also in the import statement above)
 Building = comBui.MTBui_E       # TODO specify building model
 # --- END OF USER INPUT ---
 
