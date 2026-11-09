@@ -6,58 +6,74 @@ from bamLoadBasedTesting.oneMassModel import CalcParameters
 temperature applications as well as heating and cooling operation.
 
 - Please adjust the parameters in the section "USER INPUT" if necessary.
-- This script shows examples for an average climate. If you want to test other climates please adjust the plc parameter accordingly.
-- The examples are for variable outlet temperature (except cooling at high temperature application). 
-  If you want to test fixed outlet temperature please adjust t_flow_plc for each part load condition.
-- The examples are for heat pumps using outdoor air at the outer heat exchanger. If you want to test with exhaust air please adjust t_a and relHum.
-- Naming convention:
+  In some cases, parameters have to be adjusted outside the "USER INPUT" section to parameterize the model, 
+  for example PLC and t_flow_plc. This can be done directly in the initiation of the class CalcParameters(...) for the 
+  corresponding model.
+- This script shows examples for an average climate. If you want to test other climates please add your own models.
+- The examples are for variable outlet temperature (except for cooling at high temperature application). 
+  If you want to test fixed outlet temperature please add your own models.
+- The examples are for heat pumps using outdoor air at the outer heat exchanger. If you want to test with exhaust air 
+  please add your own models.
+- If you need to add models, the example models in this script and the documentation of the class CalcParameters()
+  can help you to understand the parametrization.
+- Naming convention of the given examples:
     - The first two letters determine the temperature application (LT, MT, HT: low, medium, high temperature)
     - Then it directly follows "Bui_" (for building)
     - The next letter (seventh letter) determines the part load condition (A, B, C, D, E)
     - For cooling operation, "_cool" is added at the end.
     - For heating operation, there is no additional letter after the part load condition
-- For the cooling part load conditions, an assumption is used for the parameter dt_mean. Therefore, check the parametrization before you use cooling with variable flow!
+- For the cooling part load conditions, an assumption is used for the parameter dt_mean. 
+  Therefore, check the parametrization before you use cooling with variable flow!
 - Assumptions were also used for PLC-E (heating operation) regarding dt_mean and t_flow_plc.
 """
 
 # --- START USER INPUT ---
 # -- Parameters of the heat pump --
-# Heating
+# - Heating -
 
 # Design heating load
 p_design_h_lt = 5390        # in W, for low temperature application
 p_design_h_mt = 5390        # in W, for medium temperature application
 p_design_h_ht = 5390        # in W, for high temperature application
 
-t_a_design = -10            # in °C; see T_designh in EN 14825 (average climate)
+# Additional virtual mass of water necessary to fulfill the minimum mass of water required by the installation manual in kg
+m_w_virtual_heat_lt = 0     # in kg, for low temperature application
+m_w_virtual_heat_mt = 0     # in kg, for medium temperature application
+m_w_virtual_heat_ht = 0     # in kg, for high temperature application
 
 # Mass flow rates for heating
 mass_flow_design_heat_lt = p_design_h_lt / (4183*5)     # in kg/s; for low temperature application
 mass_flow_design_heat_mt = p_design_h_mt / (4183*8)     # in kg/s; for medium temperature application
 mass_flow_design_heat_ht = p_design_h_ht / (4183*10)    # in kg/s; for high temperature application
 
-# Cooling
-# low temperature application
-p_design_c = 5000                                       # in W; design cooling load
-mass_flow_design_cool = p_design_c / (4183*5)           # in kg/s; mass flow rate for cooling
+# - Cooling -
 
-# high temperature application
-p_design_c_ht = 5000                                    # in W; design cooling load
-mass_flow_design_cool_ht = p_design_c_ht / (4183*5)     # in kg/s; mass flow rate for cooling
+# Design cooling load
+p_design_c_lt = 5000        # in W; for low temperature application
+p_design_c_ht = 5000        # in W; for high temperature application
+
+# Additional virtual mass of water necessary to fulfill the minimum mass of water required by the installation manual in kg
+m_w_virtual_cool_lt = 0     # in kg, for low temperature application
+m_w_virtual_cool_ht = 0     # in kg, for high temperature application
+
+# Mass flow rate for cooling
+mass_flow_design_cool_lt = p_design_c_lt / (4183*5)     # in kg/s; for low temperature application
+mass_flow_design_cool_ht = p_design_c_ht / (4183*5)     # in kg/s; for high temperature application
 
 # -- Settings of the one mass model --
 use_constant_mflow = True   # if True use constant flow (variable dT), if False use variable flow (constant dT)
 
-# The parameter "m_w_virtual" is the additional virtual mass of water necessary to fulfill the minimum mass of water
-# required by the installation manual in kg. If you need to adjust this parameter you can do this directly for each
-# model for a specific test point below in the corresponding class initiation of "CalcParameters" by adjusting
-# "m_w_virtual = 0" (last parameter of the initiation). By default, "m_w_virtual" is set to 0 kg.
+# If you need to adjust parameters, e.g. PLC and/or t_flow_plc, to parameterize a model you can do this directly in the
+# initialization of the class CalcParameters(...) for the corresponding model below.
 
 # --- END USER INPUT ---
 
 # --- Parameters for one mass model (depending on operation (heating/cooling) and temperature application) ---
 # Load
 use_dynamic_load = True     # if True use dynamic load, if False use fixed load
+
+# Climate
+t_a_design = -10            # in °C; see T_designh in EN 14825 (average climate)
 
 # Building temperatures
 t_b_heat = 20               # in °C; see indoor temperature in EN 14825; constant building temperature (heating operation)
@@ -98,7 +114,7 @@ ParaMTBui_E = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_mt,
 )
 MTBui_E = ParaMTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -116,7 +132,7 @@ ParaMTBui_A = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=48.3-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_mt,
 )
 MTBui_A = ParaMTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -134,7 +150,7 @@ ParaMTBui_B = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=39.8-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_mt,
 )
 MTBui_B = ParaMTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -152,7 +168,7 @@ ParaMTBui_C = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=34.6-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_mt,
 )
 MTBui_C = ParaMTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -170,7 +186,7 @@ ParaMTBui_D = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=29.4-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_mt,
 )
 MTBui_D = ParaMTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -199,7 +215,7 @@ ParaLTBui_E = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_lt,
 )
 LTBui_E = ParaLTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -217,7 +233,7 @@ ParaLTBui_A = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=31.6-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_lt,
 )
 LTBui_A = ParaLTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -235,7 +251,7 @@ ParaLTBui_B = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=28.6-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_lt,
 )
 LTBui_B = ParaLTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -253,7 +269,7 @@ ParaLTBui_C = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=26.1-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_lt,
 )
 LTBui_C = ParaLTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -271,7 +287,7 @@ ParaLTBui_D = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=23.6-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_lt,
 )
 LTBui_D = ParaLTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -301,7 +317,7 @@ ParaHTBui_E = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_e,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_ht,
 )
 HTBui_E = ParaHTBui_E.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -319,7 +335,7 @@ ParaHTBui_A = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=56.4-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_ht,
 )
 HTBui_A = ParaHTBui_A.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -337,7 +353,7 @@ ParaHTBui_B = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=46.2-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_ht,
 )
 HTBui_B = ParaHTBui_B.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -355,7 +371,7 @@ ParaHTBui_C = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=39.2-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_ht,
 )
 HTBui_C = ParaHTBui_C.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -373,11 +389,11 @@ ParaHTBui_D = CalcParameters(
     constant_mflow=use_constant_mflow,
     dt_mean=31.2-t_b_heat,
     delta_T_cond_design=deltaT,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_heat_ht,
 )
 HTBui_D = ParaHTBui_D.createBuilding(dynamic_load=use_dynamic_load)
 
-# --- Examples for cooling operation (only at low temperature) ---
+# --- Examples for cooling operation ---
 # Explanation: the main difference here is the negative value for PLC!
 t_a_design_cool = 35
 t_flow_design_cool = 7
@@ -413,13 +429,14 @@ else:
     dt_mean_c_ht = ...
     dt_mean_d_ht = ...
 
+# -- Low temperature application --
 # Create one mass models for low temperature application (cooling)
 # Cool PLC-A
 para_bui_cool_plc_a = CalcParameters(
     t_a_design=t_a_design_cool,
     t_flow_design=t_flow_design_cool,
-    q_design=p_design_c,
-    m_dot_H_design=mass_flow_design_cool,
+    q_design=p_design_c_lt,
+    m_dot_H_design=mass_flow_design_cool_lt,
     delta_T_cond_design=deltaT_cool,
     t_a=35,
     # relHum=...,
@@ -429,7 +446,7 @@ para_bui_cool_plc_a = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_a,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_lt,
 )
 LTBui_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -437,8 +454,8 @@ LTBui_A_cool = para_bui_cool_plc_a.createBuilding(dynamic_load=use_dynamic_load)
 para_bui_cool_plc_b = CalcParameters(
     t_a_design=t_a_design_cool,
     t_flow_design=t_flow_design_cool,
-    q_design=p_design_c,
-    m_dot_H_design=mass_flow_design_cool,
+    q_design=p_design_c_lt,
+    m_dot_H_design=mass_flow_design_cool_lt,
     delta_T_cond_design=deltaT_cool,
     t_a=30,
     # relHum=...,
@@ -448,7 +465,7 @@ para_bui_cool_plc_b = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_b,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_lt,
 )
 LTBui_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -456,8 +473,8 @@ LTBui_B_cool = para_bui_cool_plc_b.createBuilding(dynamic_load=use_dynamic_load)
 para_bui_cool_plc_c = CalcParameters(
     t_a_design=t_a_design_cool,
     t_flow_design=t_flow_design_cool,
-    q_design=p_design_c,
-    m_dot_H_design=mass_flow_design_cool,
+    q_design=p_design_c_lt,
+    m_dot_H_design=mass_flow_design_cool_lt,
     delta_T_cond_design=deltaT_cool,
     t_a=25,
     # relHum=...,
@@ -467,7 +484,7 @@ para_bui_cool_plc_c = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_c,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_lt,
 )
 LTBui_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -475,8 +492,8 @@ LTBui_C_cool = para_bui_cool_plc_c.createBuilding(dynamic_load=use_dynamic_load)
 para_bui_cool_plc_d = CalcParameters(
     t_a_design=t_a_design_cool,
     t_flow_design=t_flow_design_cool,
-    q_design=p_design_c,
-    m_dot_H_design=mass_flow_design_cool,
+    q_design=p_design_c_lt,
+    m_dot_H_design=mass_flow_design_cool_lt,
     delta_T_cond_design=deltaT_cool,
     t_a=20,
     # relHum=...,
@@ -486,10 +503,11 @@ para_bui_cool_plc_d = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_d,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_lt,
 )
 LTBui_D_cool = para_bui_cool_plc_d.createBuilding(dynamic_load=use_dynamic_load)
 
+# -- High temperature application --
 # Create one mass models for high temperature application (cooling)
 # Cool PLC-A
 para_bui_cool_plc_a_ht = CalcParameters(
@@ -506,7 +524,7 @@ para_bui_cool_plc_a_ht = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_a_ht,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_ht,
 )
 HTBui_A_cool = para_bui_cool_plc_a_ht.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -525,7 +543,7 @@ para_bui_cool_plc_b_ht = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_b_ht,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_ht,
 )
 HTBui_B_cool = para_bui_cool_plc_b_ht.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -544,7 +562,7 @@ para_bui_cool_plc_c_ht = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_c_ht,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_ht,
 )
 HTBui_C_cool = para_bui_cool_plc_c_ht.createBuilding(dynamic_load=use_dynamic_load)
 
@@ -563,6 +581,6 @@ para_bui_cool_plc_d_ht = CalcParameters(
     t_b=t_b_cool,
     constant_mflow=use_constant_mflow,
     dt_mean=dt_mean_d_ht,
-    m_w_virtual = 0,
+    m_w_virtual=m_w_virtual_cool_ht,
 )
 HTBui_D_cool = para_bui_cool_plc_d_ht.createBuilding(dynamic_load=use_dynamic_load)
